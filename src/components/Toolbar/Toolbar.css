@@ -1,0 +1,12 @@
+.toolbar {
+  display: flex;
+  padding: 15px;
+  background-color: #fff;
+  border-bottom: 1px solid #ccc;
+}
+
+.separator {
+  width: 1px;
+  background-color: #ccc;
+  margin: 0 5px;
+}
