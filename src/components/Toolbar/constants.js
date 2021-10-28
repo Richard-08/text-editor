@@ -1,0 +1,78 @@
+export const TOOLBAR = [
+  {
+    tag: "h1",
+    type: "block",
+    name: "H1",
+    tooltip: "",
+    role: "button",
+  },
+  {
+    tag: "h2",
+    type: "block",
+    name: "H2",
+    tooltip: "",
+    role: "button",
+  },
+  {
+    tag: "h3",
+    type: "block",
+    name: "H3",
+    tooltip: "",
+    role: "button",
+  },
+  {
+    tag: "h4",
+    type: "block",
+    name: "H4",
+    tooltip: "",
+    role: "button",
+  },
+  {
+    tag: "h5",
+    type: "block",
+    name: "H5",
+    tooltip: "",
+    role: "button",
+  },
+  {
+    tag: "h6",
+    type: "block",
+    name: "H6",
+    tooltip: "",
+    role: "button",
+  },
+  {
+    role: "separator",
+  },
+  {
+    tag: "blockquote",
+    type: "block",
+    name: "Blockquote",
+    tooltip: "",
+    role: "button",
+  },
+  {
+    role: "separator",
+  },
+  {
+    tag: "strong",
+    type: "inline",
+    name: "Bold",
+    tooltip: "",
+    role: "button",
+  },
+  {
+    tag: "em",
+    type: "inline",
+    name: "Italic",
+    tooltip: "",
+    role: "button",
+  },
+  {
+    tag: "code",
+    type: "inline",
+    name: "Code",
+    tooltip: "",
+    role: "button",
+  },
+];

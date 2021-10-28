@@ -1,0 +1,18 @@
+.btn {
+  border: none;
+  padding: 0.7em 1.2em;
+  font-size: 14px;
+  cursor: pointer;
+  background-color: transparent;
+  border-radius: 5px;
+  margin: 0 2px;
+}
+
+.btn:hover {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.btn.active {
+  color: coral;
+  font-weight: bold;
+}
