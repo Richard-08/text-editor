@@ -23,6 +23,11 @@ export default class Editor extends Component {
           tag: "p",
           content: "Hello&nbsp;<em>there!</em>",
         },
+        {
+          type: "paragraph",
+          tag: "p",
+          content: "Hi&nbsp;<strong>everyone!</strong>",
+        },
       ],
       selection: {
         start: 0,
@@ -115,7 +120,7 @@ export default class Editor extends Component {
       }
     } else if (e.key === "Backspace") {
       if (this.state.selection.isCollapsed) {
-        const block_idx = this.state.activeBlockIdx;
+        const { startBlock, startBlockIdx } = this.state.selection;
 
         if (
           this.state.selection.start === 0 &&
@@ -123,26 +128,30 @@ export default class Editor extends Component {
         ) {
           e.preventDefault();
 
-          if (block_idx !== 0) {
+          if (startBlockIdx !== 0) {
+            const prevBlockNode =
+              this.editorRef.current.childNodes[startBlockIdx - 1];
+            const selectPosition = prevBlockNode.textContent.length;
+
             this.setState(
               (state) => {
-                if (state.activeBlock.textContent.length) {
-                  state.blocks[state.activeBlockIdx - 1].content +=
-                    state.blocks[state.activeBlockIdx].content;
+                if (startBlock.textContent.length) {
+                  const block = { ...state.blocks[startBlockIdx - 1] };
+                  state.blocks[startBlockIdx - 1] = {
+                    ...block,
+                    content:
+                      block.content + state.blocks[startBlockIdx].content,
+                  };
                 }
 
                 return {
-                  blocks: state.blocks.filter((_, idx) => idx !== block_idx),
+                  blocks: state.blocks.filter(
+                    (_, idx) => idx !== startBlockIdx
+                  ),
                 };
               },
               () => {
-                const block =
-                  this.editorRef.current.childNodes[
-                    this.state.activeBlockIdx - 1
-                  ];
-                const selectPosition = block.textContent.length;
-
-                Selection.restoreSelection(block, {
+                Selection.restoreSelection(prevBlockNode, {
                   start: selectPosition,
                   end: selectPosition,
                 });
@@ -151,6 +160,18 @@ export default class Editor extends Component {
           }
         }
       } else {
+        e.preventDefault();
+        const selection = Selection.getSelection();
+        const splittedStartBlock = Selection.splitNode(
+          selection,
+          this.state.selection.startBlock
+        );
+        const splittedEndBlock = Selection.splitNode(
+          selection,
+          this.state.selection.endBlock
+        );
+        console.log(splittedStartBlock);
+        console.log(splittedEndBlock);
       }
     }
   }
