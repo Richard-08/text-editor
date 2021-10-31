@@ -50,67 +50,102 @@ export default class Editor extends Component {
     if (e.key === "Enter") {
       e.preventDefault();
 
-      const selection = Selection.getSelection();
-      const splittedBlock = Selection.splitNode(
-        selection,
-        this.state.activeBlock
-      );
+      if (this.state.selection.startBlock && this.state.selection.endBlock) {
+        const selection = Selection.getSelection();
+        const splittedStartBlock = Selection.splitNode(
+          selection,
+          this.state.selection.startBlock
+        );
+        const splittedEndBlock = this.state.selection.isCollapsed
+          ? splittedStartBlock
+          : Selection.splitNode(selection, this.state.selection.endBlock);
 
-      this.setState(
-        (state) => {
-          state.blocks[state.activeBlockIdx].content = splittedBlock.prev;
-          return {
-            blocks: [
-              ...state.blocks.slice(0, state.activeBlockIdx + 1),
-              {
-                ...state.blocks[state.activeBlockIdx],
-                content: splittedBlock.next,
-              },
-              ...state.blocks.slice(state.activeBlockIdx + 1),
-            ],
-          };
-        },
-        () => {
-          Selection.restoreSelection(this.state.activeBlock.nextSibling);
-        }
-      );
-    } else if (e.key === "Backspace") {
-      const block_idx = this.state.activeBlockIdx;
-
-      if (this.state.selection.start === 0 && this.state.selection.end === 0) {
-        e.preventDefault();
-
-        if (block_idx !== 0) {
+        if (this.state.selection.isCollapsed) {
           this.setState(
             (state) => {
-              if (state.activeBlock.textContent.length) {
-                state.blocks[state.activeBlockIdx - 1].content +=
-                  state.blocks[state.activeBlockIdx].content;
-              }
-
+              state.blocks[state.activeBlockIdx].content =
+                splittedStartBlock.prev;
               return {
-                blocks: state.blocks.filter((_, idx) => idx !== block_idx),
+                blocks: [
+                  ...state.blocks.slice(0, state.activeBlockIdx + 1),
+                  {
+                    ...state.blocks[state.activeBlockIdx],
+                    content: splittedStartBlock.next,
+                  },
+                  ...state.blocks.slice(state.activeBlockIdx + 1),
+                ],
               };
             },
             () => {
-              const block =
-                this.editorRef.current.childNodes[
-                  this.state.activeBlockIdx - 1
-                ];
-              const selectPosition = block.textContent.length;
-
-              Selection.restoreSelection(block, {
-                start: selectPosition,
-                end: selectPosition,
-              });
+              Selection.restoreSelection(this.state.activeBlock.nextSibling);
             }
           );
+        } else {
+          this.setState((state) => {
+            const { startBlockIdx, endBlockIdx } = state.selection;
+
+            state.blocks[startBlockIdx].content =
+              splittedStartBlock.prev === "<br>"
+                ? splittedStartBlock.next
+                : splittedStartBlock.prev;
+            state.blocks[endBlockIdx].content =
+              splittedEndBlock.prev === "<br>"
+                ? splittedEndBlock.next
+                : splittedEndBlock.prev;
+
+            return {
+              blocks: [
+                ...state.blocks.slice(0, startBlockIdx + 1),
+                state.blocks[endBlockIdx],
+                ...state.blocks.slice(endBlockIdx + 1),
+              ],
+            };
+          });
         }
+      }
+    } else if (e.key === "Backspace") {
+      if (this.state.selection.isCollapsed) {
+        const block_idx = this.state.activeBlockIdx;
+
+        if (
+          this.state.selection.start === 0 &&
+          this.state.selection.end === 0
+        ) {
+          e.preventDefault();
+
+          if (block_idx !== 0) {
+            this.setState(
+              (state) => {
+                if (state.activeBlock.textContent.length) {
+                  state.blocks[state.activeBlockIdx - 1].content +=
+                    state.blocks[state.activeBlockIdx].content;
+                }
+
+                return {
+                  blocks: state.blocks.filter((_, idx) => idx !== block_idx),
+                };
+              },
+              () => {
+                const block =
+                  this.editorRef.current.childNodes[
+                    this.state.activeBlockIdx - 1
+                  ];
+                const selectPosition = block.textContent.length;
+
+                Selection.restoreSelection(block, {
+                  start: selectPosition,
+                  end: selectPosition,
+                });
+              }
+            );
+          }
+        }
+      } else {
       }
     }
   }
 
-  handleChange(e) {
+  handleChange() {
     if (this.state.activeBlock) {
       const currentSelection = Selection.saveSelection(this.state.activeBlock);
       const html = this.state.activeBlock.innerHTML;
@@ -152,10 +187,14 @@ export default class Editor extends Component {
         end,
         isCollapsed,
         tags: getNodeHierarchy(currentNode, currentBlock),
-        startBlock: startBlock.node,
-        startBlockIdx: startBlock.index,
-        endBlock: endBlock.node,
-        endBlockIdx: endBlock.index,
+        startBlock:
+          startBlock.index < endBlock.index ? startBlock.node : endBlock.node,
+        startBlockIdx:
+          startBlock.index < endBlock.index ? startBlock.index : endBlock.index,
+        endBlock:
+          startBlock.index > endBlock.index ? startBlock.node : endBlock.node,
+        endBlockIdx:
+          startBlock.index > endBlock.index ? startBlock.index : endBlock.index,
       },
       activeBlock: currentBlock,
       activeBlockIdx: parseInt(currentBlock.dataset.block),
