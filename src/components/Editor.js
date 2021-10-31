@@ -63,16 +63,17 @@ export default class Editor extends Component {
         if (this.state.selection.isCollapsed) {
           this.setState(
             (state) => {
-              state.blocks[state.activeBlockIdx].content =
-                splittedStartBlock.prev;
+              const index = state.selection.startBlockIdx;
+              state.blocks[index].content = splittedStartBlock.prev;
+
               return {
                 blocks: [
-                  ...state.blocks.slice(0, state.activeBlockIdx + 1),
+                  ...state.blocks.slice(0, index + 1),
                   {
-                    ...state.blocks[state.activeBlockIdx],
+                    ...state.blocks[index],
                     content: splittedStartBlock.next,
                   },
-                  ...state.blocks.slice(state.activeBlockIdx + 1),
+                  ...state.blocks.slice(index + 1),
                 ],
               };
             },
@@ -81,26 +82,35 @@ export default class Editor extends Component {
             }
           );
         } else {
-          this.setState((state) => {
-            const { startBlockIdx, endBlockIdx } = state.selection;
+          this.setState(
+            (state) => {
+              const { startBlockIdx, endBlockIdx } = state.selection;
 
-            state.blocks[startBlockIdx].content =
-              splittedStartBlock.prev === "<br>"
-                ? splittedStartBlock.next
-                : splittedStartBlock.prev;
-            state.blocks[endBlockIdx].content =
-              splittedEndBlock.prev === "<br>"
-                ? splittedEndBlock.next
-                : splittedEndBlock.prev;
+              state.blocks[startBlockIdx].content =
+                splittedStartBlock.prev === "<br>"
+                  ? splittedStartBlock.next
+                  : splittedStartBlock.prev;
+              state.blocks[endBlockIdx].content =
+                splittedEndBlock.prev === "<br>"
+                  ? splittedEndBlock.next
+                  : splittedEndBlock.prev;
 
-            return {
-              blocks: [
-                ...state.blocks.slice(0, startBlockIdx + 1),
-                state.blocks[endBlockIdx],
-                ...state.blocks.slice(endBlockIdx + 1),
-              ],
-            };
-          });
+              return {
+                blocks: [
+                  ...state.blocks.slice(0, startBlockIdx + 1),
+                  state.blocks[endBlockIdx],
+                  ...state.blocks.slice(endBlockIdx + 1),
+                ],
+              };
+            },
+            () => {
+              const block =
+                this.editorRef.current.childNodes[
+                  this.state.selection.startBlockIdx + 1
+                ];
+              Selection.restoreSelection(block);
+            }
+          );
         }
       }
     } else if (e.key === "Backspace") {
@@ -169,7 +179,6 @@ export default class Editor extends Component {
 
   handleSelect() {
     const { isCollapsed, anchorNode, focusNode } = Selection.getSelection();
-
     const blockSelector = "[data-block]";
     const startBlock = getBlockNode(anchorNode, blockSelector);
     const endBlock = isCollapsed
