@@ -2,6 +2,7 @@ const Selection = {
   getSelection() {
     return window.getSelection();
   },
+
   saveSelection(el) {
     const range = window.getSelection().getRangeAt(0);
     const preSelectionRange = range.cloneRange();
@@ -16,6 +17,7 @@ const Selection = {
       end: start + range.toString().length,
     };
   },
+
   restoreSelection(el, savedSelection = { start: 0, end: 0 }) {
     let charIndex = 0;
 
