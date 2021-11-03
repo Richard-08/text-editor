@@ -83,8 +83,14 @@ const Selection = {
     next.appendChild(nextFragment);
 
     return {
-      prev: prev.textContent.length ? prev.innerHTML : "<br>",
-      next: next.textContent.length ? next.innerHTML : "<br>",
+      prev: {
+        text: prev.textContent,
+        html: prev.innerHTML,
+      },
+      next: {
+        text: next.textContent,
+        html: next.innerHTML,
+      },
     };
   },
 };
