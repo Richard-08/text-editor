@@ -63,8 +63,8 @@ export default class Editor extends Component {
     };
   }
 
-  handleInput() {
-    if (this.state.activeBlock) {
+  handleInput(e) {
+    if (this.hasSelectedBlock()) {
       const currentSelection = Selection.saveSelection(this.state.activeBlock);
       const html = this.state.activeBlock.innerHTML;
       const data = [...this.state.blocks];
