@@ -1,10 +1,10 @@
 import "./Editor.css";
 
-import Toolbar from "./Toolbar/Toolbar";
-import Block from "./Block/Block";
-import Selection from "./utils/Selection";
-import { getNodeHierarchy, getBlockNode } from "./utils/helpers";
-import EditorEditHandler from "./handlers/EditorEditHandler";
+import Toolbar from "../controls/Toolbar";
+import Block from "../contents/Block";
+import Selection from "../utils/Selection";
+import { getNodeHierarchy, getBlockNode } from "../utils/helpers";
+import EditorEditHandler from "../handlers/EditorEditHandler";
 
 import React, { Component } from "react";
 
@@ -49,7 +49,7 @@ export default class Editor extends Component {
     this.handler = EditorEditHandler;
 
     this.handleKeyDown = this.buildHandler("onKeyDown");
-    this.handleInput = this.handleInput.bind(this);
+    this.handleInput = this.buildHandler("onInput");
     this.handleSelect = this.handleSelect.bind(this);
     this.handleControl = this.handleControl.bind(this);
   }
@@ -61,28 +61,6 @@ export default class Editor extends Component {
         method(this, e);
       }
     };
-  }
-
-  handleInput(e) {
-    if (this.hasSelectedBlock()) {
-      const currentSelection = Selection.saveSelection(this.state.activeBlock);
-      const html = this.state.activeBlock.innerHTML;
-      const data = [...this.state.blocks];
-      data[this.state.activeBlockIdx].content = html;
-
-      this.setState(
-        (state) => ({
-          blocks: data,
-          selection: { ...state.selection, ...currentSelection },
-        }),
-        () => {
-          Selection.restoreSelection(
-            this.state.activeBlock,
-            this.state.selection
-          );
-        }
-      );
-    }
   }
 
   handleSelect() {

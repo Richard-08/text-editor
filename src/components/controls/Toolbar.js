@@ -1,5 +1,5 @@
 import "./Toolbar.css";
-import Button from "../Button/Button";
+import Button from "./Button";
 
 import { TOOLBAR } from "./constants";
 
