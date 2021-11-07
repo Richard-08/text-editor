@@ -3,8 +3,8 @@ import "./Editor.css";
 import Toolbar from "../controls/Toolbar";
 import Block from "../contents/Block";
 import Selection from "../utils/Selection";
-import { getNodeHierarchy, getBlockNode } from "../utils/helpers";
 import EditorEditHandler from "../handlers/EditorEditHandler";
+import { getBlockNode } from "../utils/helpers";
 
 import React, { Component } from "react";
 
@@ -44,13 +44,15 @@ export default class Editor extends Component {
       activeBlockIdx: null,
     };
 
+    this.blockSelector = "[data-block]";
+
     this.editorRef = React.createRef();
 
     this.handler = EditorEditHandler;
 
     this.handleKeyDown = this.buildHandler("onKeyDown");
-    this.handleInput = this.buildHandler("onInput");
-    this.handleSelect = this.handleSelect.bind(this);
+    this.handleBeforeInput = this.buildHandler("onBeforeInput");
+    this.handleSelect = this.buildHandler("onSelect");
     this.handleControl = this.handleControl.bind(this);
   }
 
@@ -61,45 +63,6 @@ export default class Editor extends Component {
         method(this, e);
       }
     };
-  }
-
-  handleSelect() {
-    const { isCollapsed, anchorNode, focusNode } = Selection.getSelection();
-    if (anchorNode && focusNode) {
-      const blockSelector = "[data-block]";
-      const startBlock = getBlockNode(anchorNode, blockSelector);
-      const endBlock = isCollapsed
-        ? startBlock
-        : getBlockNode(focusNode, blockSelector);
-
-      const currentBlock = isCollapsed ? startBlock.node : endBlock.node;
-      const { start, end } = Selection.saveSelection(currentBlock);
-
-      const currentNode = isCollapsed ? anchorNode : focusNode;
-
-      this.setState({
-        selection: {
-          start,
-          end,
-          isCollapsed,
-          tags: getNodeHierarchy(currentNode, currentBlock),
-          startBlock:
-            startBlock.index < endBlock.index ? startBlock.node : endBlock.node,
-          startBlockIdx:
-            startBlock.index < endBlock.index
-              ? startBlock.index
-              : endBlock.index,
-          endBlock:
-            startBlock.index > endBlock.index ? startBlock.node : endBlock.node,
-          endBlockIdx:
-            startBlock.index > endBlock.index
-              ? startBlock.index
-              : endBlock.index,
-        },
-        activeBlock: currentBlock,
-        activeBlockIdx: parseInt(currentBlock.dataset.block),
-      });
-    }
   }
 
   handleControl(value) {
@@ -128,7 +91,23 @@ export default class Editor extends Component {
   }
 
   hasSelectedBlock() {
-    return this.state.selection.startBlock && this.state.selection.endBlock;
+    const { startBlock, startBlockIdx, endBlock, endBlockIdx } =
+      this.state.selection;
+
+    if (startBlock && endBlock) {
+      const { isCollapsed, anchorNode, focusNode } = window.getSelection();
+      const anchorBlock = getBlockNode(anchorNode, this.blockSelector);
+      const focusBlock = isCollapsed
+        ? anchorBlock
+        : getBlockNode(focusNode, this.blockSelector);
+
+      if (isCollapsed) {
+        return (
+          anchorBlock.node.isEqualNode(startBlock) &&
+          anchorBlock.index === startBlockIdx
+        );
+      }
+    }
   }
 
   getBlockContent(block) {
@@ -158,7 +137,7 @@ export default class Editor extends Component {
           contentEditable
           suppressContentEditableWarning
           onKeyDown={this.handleKeyDown}
-          onInput={this.handleInput}
+          onBeforeInput={this.handleBeforeInput}
           onSelect={this.handleSelect}
           ref={this.editorRef}
         >

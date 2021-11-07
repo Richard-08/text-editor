@@ -20,3 +20,19 @@ export function getBlockNode(node, selector) {
     index: blockIdx,
   };
 }
+
+export function htmlEntities(str) {
+  const fragment = document.createElement("div");
+  fragment.textContent = str;
+  return fragment.innerHTML;
+
+  //return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+export function removeTag(str, type = "open") {
+  if (type === "open") {
+    return str.replace(/^<.+?>/, "");
+  } else {
+    return str.replace(/<\/\w+>$/, "");
+  }
+}

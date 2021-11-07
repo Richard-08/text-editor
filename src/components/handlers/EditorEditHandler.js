@@ -1,9 +1,11 @@
 import editOnKeyDown from "./editOnKeyDown";
-import editOnInput from "./editOnInput";
+import editOnBeforeInput from "./editOnBeforeInput";
+import editOnSelect from "./editOnSelect";
 
 const EditorEditHandler = {
   onKeyDown: editOnKeyDown,
-  onInput: editOnInput,
+  onBeforeInput: editOnBeforeInput,
+  onSelect: editOnSelect,
 };
 
 export default EditorEditHandler;
