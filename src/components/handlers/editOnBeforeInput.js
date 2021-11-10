@@ -5,24 +5,23 @@ export default function editOnBeforeInput(editor, e) {
   e.preventDefault();
   const char = e.data;
 
-  if (editor.hasSelectedBlock() && char) {
+  if (editor.hasActiveBlock() && char) {
     if (editor.state.selection.isCollapsed) {
-      editOnSingleLineSelection(editor, char, e);
+      editOnNotSelection(editor, char, e);
     } else {
-      editOnMultipleLineSelection(editor, char, e);
+      editOnSelection(editor, char, e);
     }
   }
 }
 
-function editOnSingleLineSelection(editor, char, e) {
+function editOnNotSelection(editor, char) {
   const { startBlock, startBlockIdx } = editor.state.selection;
   const currentSelection = Selection.saveSelection(startBlock);
-  const selection = Selection.getSelection();
 
-  const splittedStartBlock = Selection.splitNode(selection, startBlock);
-
+  const { splittedStartBlock } = editor.splitSelectedBlocks();
+  
   const text =
-    removeTag(splittedStartBlock.prev.html, "close") +
+    removeTag(splittedStartBlock.prev.html, "close") + /// NEED FIX
     htmlEntities(char) +
     removeTag(splittedStartBlock.next.html);
 
@@ -44,6 +43,16 @@ function editOnSingleLineSelection(editor, char, e) {
   );
 }
 
-function editOnMultipleLineSelection(editor, char, e) {
-  console.log(e);
+function editOnSelection(editor, char) {
+  //const { splittedStartBlock, splittedEndBlock } = editor.splitSelectedBlocks();
+
+  if (editor.singleLineSelection()) {
+    editBlockContent(editor, char);
+  } else {
+    editMultipleBlocksContent(editor, char);
+  }
 }
+
+function editBlockContent(editor, char) {}
+
+function editMultipleBlocksContent(editor, char) {}

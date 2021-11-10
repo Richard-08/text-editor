@@ -9,10 +9,11 @@
 }
 
 .btn:hover {
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 .btn.active {
   color: coral;
   font-weight: bold;
+  background-color: rgba(255, 127, 80, 0.15);
 }

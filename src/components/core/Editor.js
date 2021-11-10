@@ -90,9 +90,8 @@ export default class Editor extends Component {
     }
   }
 
-  hasSelectedBlock() {
-    const { startBlock, startBlockIdx, endBlock, endBlockIdx } =
-      this.state.selection;
+  hasActiveBlock() {
+    const { startBlock, startBlockIdx, endBlock } = this.state.selection;
 
     if (startBlock && endBlock) {
       const { isCollapsed, anchorNode, focusNode } = window.getSelection();
@@ -107,7 +106,35 @@ export default class Editor extends Component {
           anchorBlock.index === startBlockIdx
         );
       }
+
+      return anchorBlock.index < focusBlock.index
+        ? anchorBlock.node.isEqualNode(startBlock) &&
+            focusBlock.node.isEqualNode(endBlock)
+        : anchorBlock.node.isEqualNode(endBlock) &&
+            focusBlock.node.isEqualNode(startBlock);
     }
+  }
+
+  splitSelectedBlocks() {
+    const { isCollapsed, startBlock, endBlock } = this.state.selection;
+    const selection = Selection.getSelection();
+
+    const splittedStartBlock = Selection.splitNode(selection, startBlock);
+    const splittedEndBlock =
+      isCollapsed || this.singleLineSelection()
+        ? splittedStartBlock
+        : Selection.splitNode(selection, endBlock);
+
+    return {
+      splittedStartBlock,
+      splittedEndBlock,
+    };
+  }
+
+  singleLineSelection() {
+    return (
+      this.state.selection.startBlockIdx === this.state.selection.endBlockIdx
+    );
   }
 
   getBlockContent(block) {

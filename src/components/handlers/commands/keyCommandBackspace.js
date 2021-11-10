@@ -1,7 +1,7 @@
 import Selection from "../../utils/Selection";
 
 export default function keyCommandBackspace(editor) {
-  if (editor.hasSelectedBlock()) {
+  if (editor.hasActiveBlock()) {
     if (editor.state.selection.isCollapsed) {
       editOnNotSelection(editor);
     } else {
@@ -10,8 +10,11 @@ export default function keyCommandBackspace(editor) {
   }
 }
 
+/* ************************ Edit on not selection ************************* */
+
 function editOnNotSelection(editor) {
-  if (editor.state.selection.start === 0 && editor.state.selection.end === 0) {
+  const { start, end } = editor.state.selection;
+  if (0 === start && 0 === end) {
     removeBlock(editor);
   } else {
     removeCharacter(editor);
@@ -51,29 +54,16 @@ function removeBlock(editor) {
 }
 
 function removeCharacter(editor) {
-  const selection = Selection.getSelection();
-
-  const splittedBlock = Selection.splitNode(
-    selection,
-    editor.state.selection.startBlock
-  );
-  console.log(splittedBlock);
+  const { splittedStartBlock } = editor.splitSelectedBlocks();
+  console.log(splittedStartBlock);
 }
 
+/* ************************ Edit on selection ************************* */
+
 function editOnSelection(editor) {
-  const { startBlockIdx, endBlockIdx } = editor.state.selection;
-  const selection = Selection.getSelection();
+  const { splittedStartBlock, splittedEndBlock } = editor.splitSelectedBlocks();
 
-  const splittedStartBlock = Selection.splitNode(
-    selection,
-    editor.state.selection.startBlock
-  );
-  const splittedEndBlock =
-    startBlockIdx === endBlockIdx
-      ? splittedStartBlock
-      : Selection.splitNode(selection, editor.state.selection.endBlock);
-
-  if (startBlockIdx === endBlockIdx) {
+  if (editor.singleLineSelection()) {
     removeBlockContent(editor, splittedStartBlock);
   } else {
     removeMultipleBlocksContent(editor, splittedStartBlock, splittedEndBlock);
@@ -82,7 +72,6 @@ function editOnSelection(editor) {
 
 function removeBlockContent(editor, block) {
   const { startBlockIdx } = editor.state.selection;
-
   const blockContent = editor.getBlockContent(block);
 
   editor.setState(

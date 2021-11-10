@@ -1,30 +1,20 @@
 import Selection from "../../utils/Selection";
 
 export default function keyCommandInsertBlock(editor) {
-  if (editor.hasSelectedBlock()) {
-    const selection = Selection.getSelection();
+  if (editor.hasActiveBlock()) {
+    const { isCollapsed } = editor.state.selection;
 
-    const splittedStartBlock = Selection.splitNode(
-      selection,
-      editor.state.selection.startBlock
-    );
-    const splittedEndBlock = editor.state.selection.isCollapsed
-      ? splittedStartBlock
-      : Selection.splitNode(selection, editor.state.selection.endBlock);
-
-    if (editor.state.selection.isCollapsed) {
-      insertOnSingleLineSelection(editor, splittedStartBlock);
+    if (isCollapsed || editor.singleLineSelection()) {
+      insertOnNotSelection(editor);
     } else {
-      insertOnMultipleLineSelection(
-        editor,
-        splittedStartBlock,
-        splittedEndBlock
-      );
+      insertOnSelection(editor);
     }
   }
 }
 
-function insertOnSingleLineSelection(editor, block) {
+function insertOnNotSelection(editor) {
+  const block = editor.splitSelectedBlocks().splittedStartBlock;
+
   editor.setState(
     (state) => {
       const index = state.selection.startBlockIdx;
@@ -47,9 +37,10 @@ function insertOnSingleLineSelection(editor, block) {
   );
 }
 
-function insertOnMultipleLineSelection(editor, startBlock, endBlock) {
-  const startContent = editor.getBlockContent(startBlock);
-  const endContent = editor.getBlockContent(endBlock);
+function insertOnSelection(editor) {
+  const { splittedStartBlock, splittedEndBlock } = editor.splitSelectedBlocks();
+  const startContent = editor.getBlockContent(splittedStartBlock);
+  const endContent = editor.getBlockContent(splittedEndBlock);
 
   editor.setState(
     (state) => {
