@@ -1,5 +1,5 @@
 import Selection from "../utils/Selection";
-import { htmlEntities, removeTag } from "../utils/helpers";
+import { htmlEntities } from "../utils/helpers";
 
 export default function editOnBeforeInput(editor, e) {
   e.preventDefault();
@@ -15,32 +15,21 @@ export default function editOnBeforeInput(editor, e) {
 }
 
 function editOnNotSelection(editor, char) {
-  const { startBlock, startBlockIdx } = editor.state.selection;
-  const currentSelection = Selection.saveSelection(startBlock);
+  const { startBlockIdx } = editor.state.selection;
+  const { prev, next } = editor.formattedSplitBlock();
 
-  const { splittedStartBlock } = editor.splitSelectedBlocks();
-  
-  const text =
-    removeTag(splittedStartBlock.prev.html, "close") + /// NEED FIX
-    htmlEntities(char) +
-    removeTag(splittedStartBlock.next.html);
+  const text = prev.html + htmlEntities(char) + next.html;
 
   const data = [...editor.state.blocks];
   data[startBlockIdx].content = text;
 
-  editor.setState(
-    (state) => ({
-      blocks: data,
-      selection: { ...state.selection, ...currentSelection },
-    }),
-    () => {
-      const cursorPosition = editor.state.selection.start + char.length;
-      Selection.restoreSelection(editor.state.selection.startBlock, {
-        start: cursorPosition,
-        end: cursorPosition,
-      });
-    }
-  );
+  editor.setState({ blocks: data }, () => {
+    const cursorPosition = editor.state.selection.start + char.length;
+    Selection.restoreSelection(editor.state.selection.startBlock, {
+      start: cursorPosition,
+      end: cursorPosition,
+    });
+  });
 }
 
 function editOnSelection(editor, char) {

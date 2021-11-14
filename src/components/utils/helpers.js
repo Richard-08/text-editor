@@ -21,18 +21,60 @@ export function getBlockNode(node, selector) {
   };
 }
 
-export function htmlEntities(str) {
-  const fragment = document.createElement("div");
-  fragment.textContent = str;
-  return fragment.innerHTML;
+const SPECIAL_CHARS = {
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  /* '"': "&quot;", */
+};
 
-  //return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+export function htmlEntities(str) {
+  const special_char = SPECIAL_CHARS[str];
+  if (special_char) {
+    const regexp = new RegExp(`${str}`);
+    return str.replace(regexp, special_char);
+  }
+
+  return str;
+}
+
+export function removeLastChar(str, char) {
+  const special_char = SPECIAL_CHARS[char];
+
+  if (special_char) {
+    const regexp = new RegExp(`${special_char}$`);
+    return str.replace(regexp, "");
+  }
+
+  return str.slice(0, str.length - 1);
+}
+
+/* 
+const fragment = document.createElement("div");
+    fragment.textContent = str;
+    return fragment.innerHTML;
+  return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+  */
+
+const OPEN_TAG_REGEX = /^<(\w+)>/;
+const CLOSE_TAG_REGEX = /<\/(\w+)>$/;
+
+function getTagName(str, type = "open") {
+  const match = str.match(type === "open" ? OPEN_TAG_REGEX : CLOSE_TAG_REGEX);
+  return match && match.length >= 1 ? match[1] : null;
 }
 
 export function removeTag(str, type = "open") {
-  if (type === "open") {
-    return str.replace(/^<.+?>/, "");
-  } else {
-    return str.replace(/<\/\w+>$/, "");
-  }
+  return str.replace(type === "open" ? OPEN_TAG_REGEX : CLOSE_TAG_REGEX, "");
+}
+
+export function hasSameTags(startStr, endStr) {
+  const startTag = getTagName(startStr, "close");
+  const endTag = getTagName(endStr);
+
+  return startTag && endTag && startTag === endTag;
 }

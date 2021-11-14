@@ -4,7 +4,7 @@ import Toolbar from "../controls/Toolbar";
 import Block from "../contents/Block";
 import Selection from "../utils/Selection";
 import EditorEditHandler from "../handlers/EditorEditHandler";
-import { getBlockNode } from "../utils/helpers";
+import { getBlockNode, removeTag, hasSameTags } from "../utils/helpers";
 
 import React, { Component } from "react";
 
@@ -17,17 +17,17 @@ export default class Editor extends Component {
         {
           type: "paragraph",
           tag: "h1",
-          content: "Title",
+          content: "Title<br>",
         },
         {
           type: "paragraph",
           tag: "p",
-          content: "Hello&nbsp;<em>there!</em>",
+          content: "Hello <em>there!</em><br>",
         },
         {
           type: "paragraph",
           tag: "p",
-          content: "Hi&nbsp;<strong>everyone!</strong>",
+          content: "Hi <strong><em>everyone!</em></strong><br>",
         },
       ],
       selection: {
@@ -128,6 +128,28 @@ export default class Editor extends Component {
     return {
       splittedStartBlock,
       splittedEndBlock,
+    };
+  }
+
+  formattedSplitBlock() {
+    const { splittedStartBlock } = this.splitSelectedBlocks();
+
+    let startContent = splittedStartBlock.prev.html;
+    let endContent = splittedStartBlock.next.html;
+
+    while (hasSameTags(startContent, endContent)) {
+      startContent = removeTag(startContent, "close");
+      endContent = removeTag(endContent);
+    }
+    return {
+      prev: {
+        html: startContent,
+        text: splittedStartBlock.prev.text,
+      },
+      next: {
+        html: endContent,
+        text: splittedStartBlock.prev.text,
+      },
     };
   }
 

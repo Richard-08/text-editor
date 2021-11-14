@@ -1,4 +1,5 @@
 import Selection from "../../utils/Selection";
+import { removeLastChar } from "../../utils/helpers";
 
 export default function keyCommandBackspace(editor) {
   if (editor.hasActiveBlock()) {
@@ -54,8 +55,22 @@ function removeBlock(editor) {
 }
 
 function removeCharacter(editor) {
-  const { splittedStartBlock } = editor.splitSelectedBlocks();
-  console.log(splittedStartBlock);
+  const { startBlockIdx } = editor.state.selection;
+  const { prev, next } = editor.formattedSplitBlock();
+  const char = prev.text[prev.text.length - 1];
+
+  const content = removeLastChar(prev.html, char) + next.html;
+
+  const data = [...editor.state.blocks];
+  data[startBlockIdx].content = content;
+
+  editor.setState({ blocks: data }, () => {
+    const cursorPosition = editor.state.selection.start - 1;
+    Selection.restoreSelection(editor.state.selection.startBlock, {
+      start: cursorPosition,
+      end: cursorPosition,
+    });
+  });
 }
 
 /* ************************ Edit on selection ************************* */
