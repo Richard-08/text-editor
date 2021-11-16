@@ -40,8 +40,6 @@ export default class Editor extends Component {
         startBlockIdx: null,
         endBlockIdx: null,
       },
-      activeBlock: null,
-      activeBlockIdx: null,
     };
 
     this.blockSelector = "[data-block]";
