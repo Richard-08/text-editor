@@ -17,17 +17,17 @@ export default class Editor extends Component {
         {
           type: "paragraph",
           tag: "h1",
-          content: "Title<br>",
+          content: "Title",
         },
         {
           type: "paragraph",
           tag: "p",
-          content: "Hello <em>there!</em><br>",
+          content: "Hello <em>there!</em>",
         },
         {
           type: "paragraph",
           tag: "p",
-          content: "Hi <strong><em>everyone!</em></strong><br>",
+          content: "Hi <strong><em>everyone!</em></strong>",
         },
       ],
       selection: {
@@ -148,7 +148,7 @@ export default class Editor extends Component {
       },
       next: {
         html: endContent,
-        text: splittedStartBlock.prev.text,
+        text: splittedStartBlock.next.text,
       },
     };
   }

@@ -57,9 +57,13 @@ function removeBlock(editor) {
 function removeCharacter(editor) {
   const { startBlockIdx } = editor.state.selection;
   const { prev, next } = editor.formattedSplitBlock();
+
   const char = prev.text[prev.text.length - 1];
 
-  const content = removeLastChar(prev.html, char) + next.html;
+  const content = editor.getBlockContent({
+    html: removeLastChar(prev.html, char) + next.html,
+    text: prev.text.slice(0, prev.text.length - 1) + next.text,
+  });
 
   const data = [...editor.state.blocks];
   data[startBlockIdx].content = content;
@@ -76,48 +80,49 @@ function removeCharacter(editor) {
 /* ************************ Edit on selection ************************* */
 
 function editOnSelection(editor) {
-  const { splittedStartBlock, splittedEndBlock } = editor.splitSelectedBlocks();
-
   if (editor.singleLineSelection()) {
-    removeBlockContent(editor, splittedStartBlock);
+    removeBlockContent(editor);
   } else {
-    removeMultipleBlocksContent(editor, splittedStartBlock, splittedEndBlock);
+    removeMultipleBlocksContent(editor);
   }
 }
 
-function removeBlockContent(editor, block) {
+function removeBlockContent(editor) {
   const { startBlockIdx } = editor.state.selection;
-  const blockContent = editor.getBlockContent(block);
+  const { prev, next } = editor.formattedSplitBlock();
 
-  editor.setState(
-    (state) => {
-      const data = [...state.blocks];
-      data[startBlockIdx].content = blockContent.html;
+  const content = editor.getBlockContent({
+    html: prev.html + next.html,
+    text: prev.text + next.text,
+  });
 
-      return {
-        blocks: data,
-      };
-    },
-    () => {
-      Selection.restoreSelection(editor.state.selection.startBlock, {
-        start: blockContent.text.length,
-        end: blockContent.text.length,
-      });
-    }
-  );
+  const data = [...editor.state.blocks];
+  data[startBlockIdx].content = content;
+
+  editor.setState({ blocks: data }, () => {
+    const { start, end } = editor.state.selection;
+
+    Selection.restoreSelection(editor.state.selection.startBlock, {
+      start,
+      end,
+    });
+  });
 }
 
-function removeMultipleBlocksContent(editor, startBlock, endBlock) {
+function removeMultipleBlocksContent(editor) {
+  const { splittedStartBlock, splittedEndBlock } = editor.splitSelectedBlocks();
   const { startBlockIdx, endBlockIdx } = editor.state.selection;
 
-  const startContent = editor.getBlockContent(startBlock);
-  const endContent = editor.getBlockContent(endBlock);
+  const startContent = editor.getBlockContent(splittedStartBlock);
+  const endContent = editor.getBlockContent(splittedEndBlock);
 
   editor.setState(
     (state) => {
       const block = {
         ...state.blocks[startBlockIdx],
-        content: startContent.html + (endContent.text ? endContent.html : ""),
+        content:
+          (startContent.text ? startContent.html : "") +
+          (endContent.text ? endContent.html : ""),
       };
 
       return {
