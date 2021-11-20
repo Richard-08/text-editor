@@ -17,3 +17,26 @@
   font-weight: bold;
   background-color: rgba(255, 127, 80, 0.15);
 }
+
+[data-tooltip] {
+  position: relative;
+}
+
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: -100%;
+  right: 50%;
+  transform: translateX(50%);
+  visibility: hidden;
+  transition-delay: 0.2s;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  padding: 5px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+[data-tooltip]:hover::after {
+  visibility: visible;
+}

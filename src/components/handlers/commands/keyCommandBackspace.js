@@ -66,7 +66,10 @@ function removeCharacter(editor) {
   });
 
   const data = [...editor.state.blocks];
-  data[startBlockIdx].content = content;
+  data[startBlockIdx] = {
+    ...data[startBlockIdx],
+    content: content,
+  };
 
   editor.setState({ blocks: data }, () => {
     const cursorPosition = editor.state.selection.start - 1;
@@ -97,7 +100,10 @@ function removeBlockContent(editor) {
   });
 
   const data = [...editor.state.blocks];
-  data[startBlockIdx].content = content;
+  data[startBlockIdx] = {
+    ...data[startBlockIdx],
+    content: content,
+  };
 
   editor.setState({ blocks: data }, () => {
     const { start, end } = editor.state.selection;
@@ -120,9 +126,7 @@ function removeMultipleBlocksContent(editor) {
     (state) => {
       const block = {
         ...state.blocks[startBlockIdx],
-        content:
-          (startContent.text ? startContent.html : "") +
-          endContent.html,
+        content: (startContent.text ? startContent.html : "") + endContent.html,
       };
 
       return {

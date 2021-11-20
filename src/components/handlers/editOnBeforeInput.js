@@ -21,7 +21,10 @@ function editOnSingleLineSelection(editor, char) {
   const content = prev.html + htmlEntities(char) + next.html;
 
   const data = [...editor.state.blocks];
-  data[startBlockIdx].content = content;
+  data[startBlockIdx] = {
+    ...data[startBlockIdx],
+    content: content,
+  };
 
   editor.setState({ blocks: data }, () => {
     const cursorPosition = editor.state.selection.start + char.length;
