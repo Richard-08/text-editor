@@ -122,7 +122,7 @@ function removeMultipleBlocksContent(editor) {
         ...state.blocks[startBlockIdx],
         content:
           (startContent.text ? startContent.html : "") +
-          (endContent.text ? endContent.html : ""),
+          endContent.html,
       };
 
       return {

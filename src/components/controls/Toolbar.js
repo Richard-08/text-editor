@@ -4,15 +4,15 @@ import Button from "./Button";
 import { TOOLBAR } from "./constants";
 
 export default function Toolbar({ selection, handleControl }) {
-  const handleClick = (target) => {
-    handleControl(target);
+  const handleClick = (e, value) => {
+    handleControl(e, value)
   };
 
   const controls = () => {
     return TOOLBAR.map((item) => {
       return {
         ...item,
-        active: selection.tags.includes(item.tag),
+        active: /* editor.state. */selection.tags.includes(item.tag),
       };
     });
   };

@@ -48,44 +48,29 @@ export default class Editor extends Component {
 
     this.handler = EditorEditHandler;
 
+    this.handleFocus = this.buildHandler("onFocus");
+    this.handleBlur = this.buildHandler("onBlur");
     this.handleKeyDown = this.buildHandler("onKeyDown");
     this.handleBeforeInput = this.buildHandler("onBeforeInput");
     this.handleSelect = this.buildHandler("onSelect");
-    this.handleControl = this.handleControl.bind(this);
+    this.handleControl = this.buildHandler("onFormatting");
+  }
+
+  handleFocus(e) {
+    console.log(e);
+  }
+
+  handleBlur(e) {
+    console.log(e);
   }
 
   buildHandler(eventName) {
-    return (e) => {
+    return (e, data) => {
       const method = this.handler[eventName];
       if (method) {
-        method(this, e);
+        method(this, e, data);
       }
     };
-  }
-
-  handleControl(value) {
-    if (this.state.activeBlock) {
-      const data = [...this.state.blocks];
-
-      if (value.type === "block") {
-        data[this.state.activeBlockIdx].tag = value.tag;
-      }
-
-      this.setState({ blocks: data }, () => {
-        this.setState(
-          (state) => ({
-            activeBlock:
-              this.editorRef.current.childNodes[state.activeBlockIdx],
-          }),
-          () => {
-            Selection.restoreSelection(
-              this.state.activeBlock,
-              this.state.selection
-            );
-          }
-        );
-      });
-    }
   }
 
   hasActiveBlock() {
@@ -186,6 +171,8 @@ export default class Editor extends Component {
           onKeyDown={this.handleKeyDown}
           onBeforeInput={this.handleBeforeInput}
           onSelect={this.handleSelect}
+          onFocus={this.handleFocus}
+          onBlur={this.handleBlur}
           ref={this.editorRef}
         >
           {this.state.blocks.map((item, i) => (

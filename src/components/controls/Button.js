@@ -5,7 +5,7 @@ export default function Button({ data, handleClick }) {
     <button
       className={`btn ${data.active && "active"}`}
       data-tooltip={data.tooltip}
-      onClick={() => handleClick(data)}
+      onClick={(e) => handleClick(e, data)}
     >
       {data.name}
     </button>

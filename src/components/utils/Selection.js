@@ -77,17 +77,25 @@ const Selection = {
     nextRange.setEndAfter(lastChild);
 
     const prev = document.createElement("div");
+    const current = document.createElement("div");
     const next = document.createElement("div");
+
     const prevFragment = previousRange.cloneContents();
+    const currentFragment = range.cloneContents();
     const nextFragment = nextRange.cloneContents();
 
     prev.appendChild(prevFragment);
+    current.appendChild(currentFragment);
     next.appendChild(nextFragment);
 
     return {
       prev: {
         text: prev.textContent,
         html: prev.innerHTML,
+      },
+      current: {
+        text: current.textContent,
+        html: current.innerHTML,
       },
       next: {
         text: next.textContent,
