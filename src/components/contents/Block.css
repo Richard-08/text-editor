@@ -4,4 +4,6 @@
   line-height: 1.5;
   margin: 10px 0;
   white-space: pre-wrap;
+  cursor: text;
+  direction: ltr;
 }

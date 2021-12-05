@@ -1,3 +1,1 @@
-export default function editOnFocus(editor, e) {
-  console.log(e);
-}
+export default function editOnFocus(editor, e) {}

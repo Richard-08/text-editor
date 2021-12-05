@@ -32,7 +32,7 @@ function insertOnNotSelection(editor) {
       };
     },
     () => {
-      Selection.restoreSelection(editor.state.activeBlock.nextSibling);
+      Selection.restoreSelection(editor.state.selection.startBlock.nextSibling);
     }
   );
 }

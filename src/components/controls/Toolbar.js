@@ -1,18 +1,16 @@
 import "./Toolbar.css";
 import Button from "./Button";
 
-import { TOOLBAR } from "./constants";
-
-export default function Toolbar({ selection, handleControl }) {
+export default function Toolbar({ selection, handleControl, params }) {
   const handleClick = (e, value) => {
-    handleControl(e, value)
+    handleControl(e, value);
   };
 
   const controls = () => {
-    return TOOLBAR.map((item) => {
+    return params.map((item) => {
       return {
         ...item,
-        active: /* editor.state. */selection.tags.includes(item.tag),
+        active: selection.tags.includes(item.tag),
       };
     });
   };

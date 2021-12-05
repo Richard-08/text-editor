@@ -7,18 +7,8 @@ export function getNodeHierarchy(node, parent) {
   return tags;
 }
 
-export function getBlockNode(node, selector) {
-  const parentNode = node.nodeType === 3 ? node.parentNode : node;
-  const blockNode =
-    parentNode.dataset && parentNode.dataset.block
-      ? parentNode
-      : parentNode.closest(selector);
-  const blockIdx = parseInt(blockNode.dataset.block);
-
-  return {
-    node: blockNode,
-    index: blockIdx,
-  };
+export function intersection(arr1, arr2) {
+  return arr1.filter((value) => arr2.includes(value));
 }
 
 const SPECIAL_CHARS = {
@@ -70,6 +60,12 @@ function getTagName(str, type = "open") {
 
 export function removeTag(str, type = "open") {
   return str.replace(type === "open" ? OPEN_TAG_REGEX : CLOSE_TAG_REGEX, "");
+}
+
+export function removeAllTags(str, tagName) {
+  const regex = new RegExp(`<(/?${tagName})>`, "g");
+  const result = str.replace(regex, "");
+  return result;
 }
 
 export function hasSameTags(startStr, endStr) {

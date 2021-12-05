@@ -4,7 +4,13 @@ import Toolbar from "../controls/Toolbar";
 import Block from "../contents/Block";
 import Selection from "../utils/Selection";
 import EditorEditHandler from "../handlers/EditorEditHandler";
-import { getBlockNode, removeTag, hasSameTags } from "../utils/helpers";
+import {
+  removeTag,
+  hasSameTags,
+  getNodeHierarchy,
+  intersection,
+} from "../utils/helpers";
+import { FORMATTING_PARAMS } from "./constants";
 
 import React, { Component } from "react";
 
@@ -22,7 +28,7 @@ export default class Editor extends Component {
         {
           type: "paragraph",
           tag: "p",
-          content: "Hello <em>there!</em>",
+          content: "<em>Hello</em> <em>there!</em>",
         },
         {
           type: "paragraph",
@@ -78,10 +84,10 @@ export default class Editor extends Component {
 
     if (startBlock && endBlock) {
       const { isCollapsed, anchorNode, focusNode } = window.getSelection();
-      const anchorBlock = getBlockNode(anchorNode, this.blockSelector);
+      const anchorBlock = this.getBlockNode(anchorNode);
       const focusBlock = isCollapsed
         ? anchorBlock
-        : getBlockNode(focusNode, this.blockSelector);
+        : this.getBlockNode(focusNode);
 
       if (isCollapsed) {
         return (
@@ -136,6 +142,17 @@ export default class Editor extends Component {
     };
   }
 
+  formattedSplitContent(str) {
+    let content = str;
+
+    while (hasSameTags(content, content)) {
+      content = removeTag(content, "close");
+      content = removeTag(content);
+    }
+
+    return content;
+  }
+
   singleLineSelection() {
     return (
       this.state.selection.startBlockIdx === this.state.selection.endBlockIdx
@@ -157,10 +174,55 @@ export default class Editor extends Component {
     }
   }
 
+  getBlockNode(node) {
+    const parentNode = node.nodeType === 3 ? node.parentNode : node;
+    const blockNode =
+      parentNode.dataset && parentNode.dataset.block
+        ? parentNode
+        : parentNode.closest(this.blockSelector);
+    const blockIdx = parseInt(blockNode.dataset.block);
+
+    return {
+      node: blockNode,
+      index: blockIdx,
+    };
+  }
+
+  getBlocksFomatting(startBlock, endBlock) {
+    const { isCollapsed, anchorNode, anchorOffset, focusNode, focusOffset } =
+      Selection.getSelection();
+
+    if (isCollapsed) {
+      return getNodeHierarchy(anchorNode, startBlock);
+    } else {
+      if (!anchorNode.textContent.slice(anchorOffset).length) {
+        return getNodeHierarchy(focusNode, endBlock);
+      } else if (!focusNode.textContent.slice(0, focusOffset).length) {
+        return getNodeHierarchy(anchorNode, startBlock);
+      }
+      return intersection(
+        getNodeHierarchy(anchorNode, startBlock),
+        getNodeHierarchy(focusNode, endBlock)
+      );
+    }
+  }
+
+  isBlockTag(value) {
+    const data = FORMATTING_PARAMS.find(
+      (param) => param.tag === value.toLowerCase()
+    );
+    return data && data.type === "block";
+  }
+
+  getRootNode() {
+    return this.editorRef.current;
+  }
+
   render() {
     return (
       <div className="text-editor">
         <Toolbar
+          params={FORMATTING_PARAMS}
           handleControl={this.handleControl}
           selection={this.state.selection}
         />
@@ -174,6 +236,9 @@ export default class Editor extends Component {
           onFocus={this.handleFocus}
           onBlur={this.handleBlur}
           ref={this.editorRef}
+          tabIndex="0"
+          role="textbox"
+          spellCheck="true"
         >
           {this.state.blocks.map((item, i) => (
             <Block data={item} index={i} key={i} />
