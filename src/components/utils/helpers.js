@@ -79,3 +79,19 @@ export function hasSameTags(startStr, endStr) {
 
   return startTag && endTag && startTag === endTag;
 }
+
+export function isEqual(arr1, arr2) {
+  console.log(arr1, arr2);
+  let result = true;
+  for (let i = 0; i < arr1.length; i += 1) {
+    const keys = Object.keys(arr1[i]);
+    for (let j = 0; j < keys.length; j += 1) {
+      if (!arr2[i] || arr2[i][j] || arr1[i][j] !== arr2[i][j]) {
+        result = false;
+        break;
+      }
+    }
+  }
+
+  return result;
+}

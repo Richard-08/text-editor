@@ -43,7 +43,7 @@ function formatOnSingleLineSelection(editor, data) {
       const data = [...state.blocks];
       data[startBlockIdx] = {
         ...data[startBlockIdx],
-        formattedContent,
+        content: formattedContent,
       };
 
       return {

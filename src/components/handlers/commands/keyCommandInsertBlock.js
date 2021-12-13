@@ -18,16 +18,20 @@ function insertOnNotSelection(editor) {
   editor.commitState(
     (state) => {
       const index = state.selection.startBlockIdx;
-      state.blocks[index].content = editor.getBlockContent(block.prev);
+      const blocks = [...state.blocks];
+      blocks[index] = {
+        ...blocks[index],
+        content: editor.getBlockContent(block.prev),
+      };
 
       return {
         blocks: [
-          ...state.blocks.slice(0, index + 1),
+          ...blocks.slice(0, index + 1),
           {
-            ...state.blocks[index],
+            ...blocks[index],
             content: editor.getBlockContent(block.next),
           },
-          ...state.blocks.slice(index + 1),
+          ...blocks.slice(index + 1),
         ],
       };
     },

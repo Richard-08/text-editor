@@ -9,6 +9,7 @@ import {
   hasSameTags,
   getNodeHierarchy,
   intersection,
+  isEqual,
 } from "../utils/helpers";
 import { FORMATTING_PARAMS, INIT_STATE } from "./constants";
 
@@ -24,6 +25,7 @@ export default class Editor extends Component {
     this.currentStateIdx = 0;
     this.historyRecord = false;
     this.canMakeHistoryRecord = false;
+    this.prevActionStatus = false;
 
     this.blockSelector = "[data-block]";
 
@@ -40,9 +42,15 @@ export default class Editor extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (this.historyRecord && this.canMakeHistoryRecord) {
+    if (this.historyRecord && this.prevActionStatus) {
       this.history = this.history.slice(0, this.currentStateIdx + 1);
-      this.history.push(prevState);
+
+      if (
+        !isEqual(prevState.blocks, this.state.blocks)
+      ) {
+        this.history.push(prevState);
+      }
+
       this.history.push(this.state);
       this.currentStateIdx = this.history.length - 1;
 
@@ -50,6 +58,7 @@ export default class Editor extends Component {
       this.historyRecord = false;
       this.canMakeHistoryRecord = false;
     }
+    this.prevActionStatus = this.canMakeHistoryRecord;
   }
 
   buildHandler(eventName) {
@@ -62,8 +71,8 @@ export default class Editor extends Component {
   }
 
   commitState(state, callback) {
-    this.canMakeHistoryRecord = true;
     this.setState(state, callback);
+    this.canMakeHistoryRecord = true;
   }
 
   hasActiveBlock() {
