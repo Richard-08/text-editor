@@ -17,9 +17,6 @@ export default function editOnSelect(editor, e) {
       endBlock = isCollapsed ? startBlock : editor.getBlockNode(focusNode);
     }
 
-    console.log(startBlock);
-    console.log(endBlock);
-
     const currentBlock = isCollapsed ? startBlock.node : endBlock.node;
     const { start, end } = Selection.saveSelection(currentBlock);
 
@@ -27,6 +24,8 @@ export default function editOnSelect(editor, e) {
       startBlock.node,
       endBlock.node
     );
+
+    editor.historyRecord = true;
 
     editor.setState({
       selection: {

@@ -52,6 +52,7 @@ const fragment = document.createElement("div");
 
 const OPEN_TAG_REGEX = /^<(\w+)>/;
 const CLOSE_TAG_REGEX = /<\/(\w+)>$/;
+const EMPTY_TAGS = /<(\w+)>((<(\w+)>)+(<\/(\w+)>)+)?<\/(\w+)>/gi;
 
 function getTagName(str, type = "open") {
   const match = str.match(type === "open" ? OPEN_TAG_REGEX : CLOSE_TAG_REGEX);
@@ -66,6 +67,10 @@ export function removeAllTags(str, tagName) {
   const regex = new RegExp(`<(/?${tagName})>`, "g");
   const result = str.replace(regex, "");
   return result;
+}
+
+export function removeAllEmptyTags(str) {
+  return str.replace(EMPTY_TAGS, "");
 }
 
 export function hasSameTags(startStr, endStr) {

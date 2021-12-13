@@ -89,3 +89,33 @@ export const FORMATTING_PARAMS = [
     role: "button",
   },
 ];
+
+export const INIT_STATE = {
+  blocks: [
+    {
+      type: "paragraph",
+      tag: "h1",
+      content: "Title",
+    },
+    {
+      type: "paragraph",
+      tag: "p",
+      content: "<em>Hello</em> <em>there!</em>",
+    },
+    {
+      type: "paragraph",
+      tag: "p",
+      content: "Hi <strong><em>everyone!</em></strong>",
+    },
+  ],
+  selection: {
+    start: 0,
+    end: 0,
+    isCollapsed: true,
+    tags: [],
+    startBlock: null,
+    endBlock: null,
+    startBlockIdx: null,
+    endBlockIdx: null,
+  },
+};

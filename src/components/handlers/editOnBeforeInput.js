@@ -7,9 +7,9 @@ export default function editOnBeforeInput(editor, e) {
 
   if (editor.hasActiveBlock() && char) {
     if (editor.state.selection.isCollapsed || editor.singleLineSelection()) {
-      editOnSingleLineSelection(editor, char, e);
+      editOnSingleLineSelection(editor, char);
     } else {
-      editOnMultiLineSelection(editor, char, e);
+      editOnMultiLineSelection(editor, char);
     }
   }
 }
@@ -42,7 +42,7 @@ function editOnMultiLineSelection(editor, char) {
   const startContent = editor.getBlockContent(splittedStartBlock);
   const endContent = editor.getBlockContent(splittedEndBlock);
 
-  editor.setState(
+  editor.commitState(
     (state) => {
       const block = {
         ...state.blocks[startBlockIdx],

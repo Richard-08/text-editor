@@ -1,5 +1,5 @@
 import Selection from "../../utils/Selection";
-import { removeAllTags } from "../../utils/helpers";
+import { removeAllTags, removeAllEmptyTags } from "../../utils/helpers";
 
 export default function toggleInlineNode(editor, data) {
   if (editor.singleLineSelection()) {
@@ -12,7 +12,6 @@ export default function toggleInlineNode(editor, data) {
 function formatOnSingleLineSelection(editor, data) {
   const { splittedStartBlock, splittedEndBlock } = editor.splitSelectedBlocks();
   const { tags, startBlockIdx } = editor.state.selection;
-  console.log(splittedStartBlock, splittedEndBlock);
 
   let formattingFragment = splittedStartBlock.current.html;
   let filtered_tags = [...tags];
@@ -31,17 +30,21 @@ function formatOnSingleLineSelection(editor, data) {
       formattingFragment = `<${tag}>${formattingFragment}</${tag}>`;
     }
   });
-  console.log(formattingFragment);
 
   const content =
     splittedStartBlock.prev.html +
     formattingFragment +
     splittedStartBlock.next.html;
 
-  editor.setState(
+  const formattedContent = removeAllEmptyTags(content);
+
+  editor.commitState(
     (state) => {
       const data = [...state.blocks];
-      data[startBlockIdx].content = content;
+      data[startBlockIdx] = {
+        ...data[startBlockIdx],
+        formattedContent,
+      };
 
       return {
         blocks: data,

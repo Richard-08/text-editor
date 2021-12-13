@@ -3,7 +3,7 @@ import Selection from "../../utils/Selection";
 export default function toggleBlockNode(editor, value) {
   const { startBlockIdx, endBlockIdx } = editor.state.selection;
 
-  editor.setState(
+  editor.commitState(
     (state) => {
       const data = state.blocks
         .slice(startBlockIdx, endBlockIdx + 1)

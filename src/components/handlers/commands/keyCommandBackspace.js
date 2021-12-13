@@ -30,7 +30,7 @@ function removeBlock(editor) {
       editor.editorRef.current.childNodes[startBlockIdx - 1];
     const selectPosition = prevBlockNode.textContent.length;
 
-    editor.setState(
+    editor.commitState(
       (state) => {
         if (startBlock.textContent.length) {
           const block = { ...state.blocks[startBlockIdx - 1] };
@@ -105,7 +105,7 @@ function removeBlockContent(editor) {
     content: content,
   };
 
-  editor.setState({ blocks: data }, () => {
+  editor.commitState({ blocks: data }, () => {
     const { start, end } = editor.state.selection;
 
     Selection.restoreSelection(editor.state.selection.startBlock, {
@@ -122,7 +122,7 @@ function removeMultipleBlocksContent(editor) {
   const startContent = editor.getBlockContent(splittedStartBlock);
   const endContent = editor.getBlockContent(splittedEndBlock);
 
-  editor.setState(
+  editor.commitState(
     (state) => {
       const block = {
         ...state.blocks[startBlockIdx],

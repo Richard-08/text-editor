@@ -10,7 +10,7 @@ import {
   getNodeHierarchy,
   intersection,
 } from "../utils/helpers";
-import { FORMATTING_PARAMS } from "./constants";
+import { FORMATTING_PARAMS, INIT_STATE } from "./constants";
 
 import React, { Component } from "react";
 
@@ -18,35 +18,12 @@ export default class Editor extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      blocks: [
-        {
-          type: "paragraph",
-          tag: "h1",
-          content: "Title",
-        },
-        {
-          type: "paragraph",
-          tag: "p",
-          content: "<em>Hello</em> <em>there!</em>",
-        },
-        {
-          type: "paragraph",
-          tag: "p",
-          content: "Hi <strong><em>everyone!</em></strong>",
-        },
-      ],
-      selection: {
-        start: 0,
-        end: 0,
-        isCollapsed: true,
-        tags: [],
-        startBlock: null,
-        endBlock: null,
-        startBlockIdx: null,
-        endBlockIdx: null,
-      },
-    };
+    this.state = INIT_STATE;
+
+    this.history = [INIT_STATE];
+    this.currentStateIdx = 0;
+    this.historyRecord = false;
+    this.canMakeHistoryRecord = false;
 
     this.blockSelector = "[data-block]";
 
@@ -62,12 +39,17 @@ export default class Editor extends Component {
     this.handleControl = this.buildHandler("onFormatting");
   }
 
-  handleFocus(e) {
-    console.log(e);
-  }
+  componentDidUpdate(prevProps, prevState) {
+    if (this.historyRecord && this.canMakeHistoryRecord) {
+      this.history = this.history.slice(0, this.currentStateIdx + 1);
+      this.history.push(prevState);
+      this.history.push(this.state);
+      this.currentStateIdx = this.history.length - 1;
 
-  handleBlur(e) {
-    console.log(e);
+      console.log(this.history);
+      this.historyRecord = false;
+      this.canMakeHistoryRecord = false;
+    }
   }
 
   buildHandler(eventName) {
@@ -77,6 +59,11 @@ export default class Editor extends Component {
         method(this, e, data);
       }
     };
+  }
+
+  commitState(state, callback) {
+    this.canMakeHistoryRecord = true;
+    this.setState(state, callback);
   }
 
   hasActiveBlock() {

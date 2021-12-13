@@ -15,7 +15,7 @@ export default function keyCommandInsertBlock(editor) {
 function insertOnNotSelection(editor) {
   const block = editor.splitSelectedBlocks().splittedStartBlock;
 
-  editor.setState(
+  editor.commitState(
     (state) => {
       const index = state.selection.startBlockIdx;
       state.blocks[index].content = editor.getBlockContent(block.prev);
@@ -42,7 +42,7 @@ function insertOnSelection(editor) {
   const startContent = editor.getBlockContent(splittedStartBlock);
   const endContent = editor.getBlockContent(splittedEndBlock);
 
-  editor.setState(
+  editor.commitState(
     (state) => {
       const { startBlockIdx, endBlockIdx } = state.selection;
 
