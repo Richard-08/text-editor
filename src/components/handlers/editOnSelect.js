@@ -26,9 +26,22 @@ export default function editOnSelect(editor, e) {
     );
 
     editor.historyRecord = true;
-
+    editor.selection = {
+      start,
+      end,
+      isCollapsed,
+      tags: formatting,
+      startBlock:
+        startBlock.index < endBlock.index ? startBlock.node : endBlock.node,
+      startBlockIdx:
+        startBlock.index < endBlock.index ? startBlock.index : endBlock.index,
+      endBlock:
+        startBlock.index > endBlock.index ? startBlock.node : endBlock.node,
+      endBlockIdx:
+        startBlock.index > endBlock.index ? startBlock.index : endBlock.index,
+    };
     editor.setState({
-      selection: {
+      selection: editor.selection /* {
         start,
         end,
         isCollapsed,
@@ -41,7 +54,7 @@ export default function editOnSelect(editor, e) {
           startBlock.index > endBlock.index ? startBlock.node : endBlock.node,
         endBlockIdx:
           startBlock.index > endBlock.index ? startBlock.index : endBlock.index,
-      },
+      }, */,
     });
   }
 }

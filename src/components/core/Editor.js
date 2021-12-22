@@ -23,12 +23,16 @@ export default class Editor extends Component {
 
     this.history = [INIT_STATE];
     this.currentStateIdx = 0;
+    this.selection = {};
+
     this.historyRecord = false;
     this.canMakeHistoryRecord = false;
     this.prevActionStatus = false;
 
-    this.blockSelector = "[data-block]";
+    this.timer = null;
+    this.timeout = 500;
 
+    this.blockSelector = "[data-block]";
     this.editorRef = React.createRef();
 
     this.handler = EditorEditHandler;
@@ -36,20 +40,20 @@ export default class Editor extends Component {
     this.handleFocus = this.buildHandler("onFocus");
     this.handleBlur = this.buildHandler("onBlur");
     this.handleKeyDown = this.buildHandler("onKeyDown");
+    this.handleKeyPress = this.buildHandler("onKeyPress");
     this.handleBeforeInput = this.buildHandler("onBeforeInput");
     this.handleSelect = this.buildHandler("onSelect");
     this.handleControl = this.buildHandler("onFormatting");
   }
 
   componentDidUpdate(prevProps, prevState) {
+    clearTimeout(this.timer);
     if (this.historyRecord && this.prevActionStatus) {
       this.history = this.history.slice(0, this.currentStateIdx + 1);
 
-      if (
-        !isEqual(prevState.blocks, this.state.blocks)
-      ) {
-        this.history.push(prevState);
-      }
+      /* if (!isEqual(prevState.blocks, this.state.blocks)) {
+       this.history.push(prevState);
+      } */
 
       this.history.push(this.state);
       this.currentStateIdx = this.history.length - 1;
@@ -227,6 +231,7 @@ export default class Editor extends Component {
           contentEditable
           suppressContentEditableWarning
           onKeyDown={this.handleKeyDown}
+          onKeyUp={this.handleKeyPress}
           onBeforeInput={this.handleBeforeInput}
           onSelect={this.handleSelect}
           onFocus={this.handleFocus}

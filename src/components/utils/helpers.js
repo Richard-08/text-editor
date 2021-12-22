@@ -81,7 +81,6 @@ export function hasSameTags(startStr, endStr) {
 }
 
 export function isEqual(arr1, arr2) {
-  console.log(arr1, arr2);
   let result = true;
   for (let i = 0; i < arr1.length; i += 1) {
     const keys = Object.keys(arr1[i]);
