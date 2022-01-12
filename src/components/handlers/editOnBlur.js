@@ -4,7 +4,7 @@ export default function editOnBlur(editor, e) {
       start: 0,
       end: 0,
       isCollapsed: true,
-      tags: [],
+      formatting: [],
       startBlock: null,
       endBlock: null,
       startBlockIdx: null,

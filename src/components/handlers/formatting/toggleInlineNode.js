@@ -1,5 +1,6 @@
 import Selection from "../../utils/Selection";
 import { removeAllTags, removeAllEmptyTags } from "../../utils/helpers";
+import splitNodes from "../../utils/splitNodesWithMultiLineSelection";
 
 export default function toggleInlineNode(editor, data) {
   if (editor.singleLineSelection()) {
@@ -9,14 +10,13 @@ export default function toggleInlineNode(editor, data) {
   }
 }
 
-function formatOnSingleLineSelection(editor, data) {
-  const { splittedStartBlock, splittedEndBlock } = editor.splitSelectedBlocks();
-  const { tags, startBlockIdx } = editor.state.selection;
+function getFormattedContent(editor, splittedBlock, data) {
+  const { formatting } = editor.state.selection;
 
-  let formattingFragment = splittedStartBlock.current.html;
-  let filtered_tags = [...tags];
+  let formattingFragment = splittedBlock.current.html;
+  let filtered_tags = [...formatting];
 
-  if (tags.includes(data.tag)) {
+  if (formatting.includes(data.tag)) {
     formattingFragment = removeAllTags(formattingFragment, data.tag);
     filtered_tags = filtered_tags.filter((tag) => tag !== data.tag);
   } else {
@@ -32,11 +32,23 @@ function formatOnSingleLineSelection(editor, data) {
   });
 
   const content =
-    splittedStartBlock.prev.html +
+    ((splittedBlock.prev && splittedBlock.prev.html) || "") +
     formattingFragment +
-    splittedStartBlock.next.html;
+    ((splittedBlock.next && splittedBlock.next.html) || "");
 
-  const formattedContent = removeAllEmptyTags(content);
+  return removeAllEmptyTags(content);
+}
+
+function formatOnSingleLineSelection(editor, data) {
+  const { splittedStartBlock } = editor.splitSelectedBlocks();
+  const { startBlockIdx } = editor.state.selection;
+  console.log(splittedStartBlock);
+
+  /* const formattedContent = getFormattedContent(
+    editor,
+    splittedStartBlock,
+    data
+  );
 
   editor.commitState(
     (state) => {
@@ -56,7 +68,20 @@ function formatOnSingleLineSelection(editor, data) {
         editor.state.selection
       );
     }
-  );
+  ); */
 }
 
-function formatOnMultiLineSelection(editor, data) {}
+function formatOnMultiLineSelection(editor, data) {
+  const selection = window.getSelection();
+  const { startBlock, endBlock, startBlockIdx, endBlockIdx } =
+    editor.state.selection;
+  const { start, end } = splitNodes(selection, startBlock, endBlock);
+
+  console.log(start);
+  const formatteStartdContent = getFormattedContent(editor, start, data);
+  console.log(formatteStartdContent);
+
+  console.log(end);
+  const formatteEnddContent = getFormattedContent(editor, end, data);
+  console.log(formatteEnddContent);
+}

@@ -23,7 +23,8 @@ function editOnNotSelection(editor) {
 }
 
 function removeBlock(editor) {
-  const { startBlock, startBlockIdx } = editor.state.selection;
+  const selection = { ...editor.state.selection };
+  const { startBlock, startBlockIdx } = selection;
 
   if (startBlockIdx !== 0) {
     const prevBlockNode =
@@ -42,20 +43,26 @@ function removeBlock(editor) {
 
         return {
           blocks: state.blocks.filter((_, idx) => idx !== startBlockIdx),
+          selection: {
+            ...selection,
+            startBlockIdx: startBlockIdx - 1,
+            start: selectPosition,
+            end: selectPosition,
+          },
         };
       },
       () => {
-        Selection.restoreSelection(prevBlockNode, {
-          start: selectPosition,
-          end: selectPosition,
-        });
+        const { startBlockIdx, start, end } = editor.state.selection;
+        const node = editor.editorRef.current.childNodes[startBlockIdx];
+        Selection.restoreSelection(node, { start, end });
       }
     );
   }
 }
 
 function removeCharacter(editor) {
-  const { startBlockIdx } = editor.state.selection;
+  const selection = { ...editor.state.selection };
+  const { startBlockIdx } = selection;
   const { prev, next } = editor.formattedSplitBlock();
 
   const char = prev.text[prev.text.length - 1];
@@ -71,13 +78,22 @@ function removeCharacter(editor) {
     content: content,
   };
 
-  editor.setState({ blocks: data }, () => {
-    const cursorPosition = editor.state.selection.start - 1;
-    Selection.restoreSelection(editor.state.selection.startBlock, {
-      start: cursorPosition,
-      end: cursorPosition,
-    });
-  });
+  const cursorPosition = selection.start - 1;
+
+  editor.setState(
+    {
+      blocks: data,
+      selection: {
+        ...selection,
+        start: cursorPosition,
+        end: cursorPosition,
+      },
+    },
+    () => {
+      const { startBlock, end, start } = editor.state.selection;
+      Selection.restoreSelection(startBlock, { start, end });
+    }
+  );
 }
 
 /* ************************ Edit on selection ************************* */
@@ -91,13 +107,15 @@ function editOnSelection(editor) {
 }
 
 function removeBlockContent(editor) {
-  const { startBlockIdx } = editor.state.selection;
+  const selection = { ...editor.state.selection };
+  const { startBlockIdx } = selection;
   const { prev, next } = editor.formattedSplitBlock();
 
   const content = editor.getBlockContent({
     html: prev.html + next.html,
     text: prev.text + next.text,
   });
+  const text = prev.text + next.text;
 
   const data = [...editor.state.blocks];
   data[startBlockIdx] = {
@@ -105,14 +123,20 @@ function removeBlockContent(editor) {
     content: content,
   };
 
-  editor.commitState({ blocks: data }, () => {
-    const { start, end } = editor.state.selection;
-
-    Selection.restoreSelection(editor.state.selection.startBlock, {
-      start,
-      end,
-    });
-  });
+  editor.commitState(
+    {
+      blocks: data,
+      selection: {
+        ...selection,
+        start: text.length,
+        end: text.length,
+      },
+    },
+    () => {
+      const { startBlock, start, end } = editor.state.selection;
+      Selection.restoreSelection(startBlock, { start, end });
+    }
+  );
 }
 
 function removeMultipleBlocksContent(editor) {
@@ -135,13 +159,16 @@ function removeMultipleBlocksContent(editor) {
           block,
           ...state.blocks.slice(endBlockIdx + 1),
         ],
+        selection: {
+          ...state.selection,
+          start: startContent.text.length,
+          end: startContent.text.length,
+        },
       };
     },
     () => {
-      Selection.restoreSelection(editor.state.selection.startBlock, {
-        start: startContent.text.length,
-        end: startContent.text.length,
-      });
+      const { startBlock, start, end } = editor.state.selection;
+      Selection.restoreSelection(startBlock, { start, end });
     }
   );
 }
