@@ -8,7 +8,11 @@ export default function (selection, node) {
   previousRange.setEnd(range.startContainer, range.startOffset);
 
   const currentRange = document.createRange();
-  currentRange.setStart(focusNode, focusOffset); // currentRange.setStart(anchorNode, anchorOffset);
+  if (anchorOffset > focusOffset) {
+    currentRange.setStart(focusNode, focusOffset);
+  } else {
+    currentRange.setStart(anchorNode, anchorOffset);
+  }
   currentRange.setEndAfter(lastChild);
 
   const nextRange = document.createRange();
