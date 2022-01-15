@@ -15,7 +15,7 @@ export default function (selection, startNode, endNode) {
     start: splittedStartNode,
     end: {
       current: splittedEndNode.prev,
-      prev: splittedEndNode.current,
+      next: splittedEndNode.current,
     },
   };
 }
