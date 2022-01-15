@@ -1,19 +1,10 @@
 export default function (selection, node) {
-  const { focusOffset, focusNode, anchorOffset, anchorNode } = selection;
   const range = selection.getRangeAt(0);
   const { firstChild, lastChild } = node;
 
   const previousRange = document.createRange();
   previousRange.setStartBefore(firstChild);
   previousRange.setEnd(range.startContainer, range.startOffset);
-
-  const currentRange = document.createRange();
-  if (anchorOffset > focusOffset) {
-    currentRange.setStart(focusNode, focusOffset);
-  } else {
-    currentRange.setStart(anchorNode, anchorOffset);
-  }
-  currentRange.setEndAfter(lastChild);
 
   const nextRange = document.createRange();
   nextRange.setStart(range.endContainer, range.endOffset);
@@ -24,7 +15,7 @@ export default function (selection, node) {
   const next = document.createElement("div");
 
   const prevFragment = previousRange.cloneContents();
-  const currentFragment = currentRange.cloneContents();
+  const currentFragment = range.cloneContents();
   const nextFragment = nextRange.cloneContents();
 
   prev.appendChild(prevFragment);

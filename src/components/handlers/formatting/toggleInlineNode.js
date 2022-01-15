@@ -10,14 +10,26 @@ export default function toggleInlineNode(editor, data) {
   }
 }
 
-function getFormattedContent(formatting, splittedBlock, data) {
+function getFormattedContent(editor, splittedBlock, data) {
+  const { formatting } = editor.state.selection;
+
   let formattingFragment = splittedBlock.current.html;
+  let filtered_tags = [...formatting];
 
   if (formatting.includes(data.tag)) {
     formattingFragment = removeAllTags(formattingFragment, data.tag);
+    filtered_tags = filtered_tags.filter((tag) => tag !== data.tag);
   } else {
-    formattingFragment = `<${data.tag}>${formattingFragment}</${data.tag}>`;
+    filtered_tags.push(data.tag);
   }
+
+  formattingFragment = editor.formattedSplitContent(formattingFragment);
+
+  filtered_tags.forEach((tag) => {
+    if (!editor.isBlockTag(tag)) {
+      formattingFragment = `<${tag}>${formattingFragment}</${tag}>`;
+    }
+  });
 
   const content =
     ((splittedBlock.prev && splittedBlock.prev.html) || "") +
@@ -29,24 +41,21 @@ function getFormattedContent(formatting, splittedBlock, data) {
 
 function formatOnSingleLineSelection(editor, data) {
   const { splittedStartBlock } = editor.splitSelectedBlocks();
-  const { startBlockIdx, formatting } = editor.state.selection;
-  console.log(splittedStartBlock);
+  const { startBlockIdx } = editor.state.selection;
 
   const formattedContent = getFormattedContent(
-    formatting,
+    editor,
     splittedStartBlock,
     data
   );
-  console.log(formattedContent);
-
-  /* editor.commitState(
+  
+  editor.commitState(
     (state) => {
       const data = [...state.blocks];
       data[startBlockIdx] = {
         ...data[startBlockIdx],
         content: formattedContent,
       };
-
       return {
         blocks: data,
       };
@@ -57,20 +66,20 @@ function formatOnSingleLineSelection(editor, data) {
         editor.state.selection
       );
     }
-  ); */
+  );
 }
 
 function formatOnMultiLineSelection(editor, data) {
   const selection = window.getSelection();
-  const { startBlock, endBlock, startBlockIdx, endBlockIdx, formatting } =
+  const { startBlock, endBlock, startBlockIdx, endBlockIdx } =
     editor.state.selection;
   const { start, end } = splitNodes(selection, startBlock, endBlock);
 
   console.log(start);
-  const formatteStartdContent = getFormattedContent(formatting, start, data);
+  const formatteStartdContent = getFormattedContent(editor, start, data);
   console.log(formatteStartdContent);
 
   console.log(end);
-  const formatteEnddContent = getFormattedContent(formatting, end, data);
+  const formatteEnddContent = getFormattedContent(editor, end, data);
   console.log(formatteEnddContent);
 }
