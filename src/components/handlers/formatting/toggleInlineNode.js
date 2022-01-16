@@ -78,33 +78,41 @@ function formatOnMultiLineSelection(editor, data) {
   const formattedStartContent = getFormattedContent(formatting, start, data);
   const formattedEndContent = getFormattedContent(formatting, end, data);
 
-  editor.commitState((state) => {
-    const blocks = [...state.blocks];
-    const start = {
-      ...blocks[startBlockIdx],
-      content: formattedStartContent,
-    };
-    const end = {
-      ...blocks[endBlockIdx],
-      content: formattedEndContent,
-    };
-    const intermediate = blocks
-      .slice(startBlockIdx + 1, endBlockIdx)
-      .map((block) => {
-        return {
-          ...block,
-          content: `<${data.tag}>${block.content}</${data.tag}>`,
-        };
-      });
+  editor.commitState(
+    (state) => {
+      const blocks = [...state.blocks];
+      const start = {
+        ...blocks[startBlockIdx],
+        content: formattedStartContent,
+      };
+      const end = {
+        ...blocks[endBlockIdx],
+        content: formattedEndContent,
+      };
+      const intermediate = blocks
+        .slice(startBlockIdx + 1, endBlockIdx)
+        .map((block) => {
+          return {
+            ...block,
+            content: `<${data.tag}>${block.content}</${data.tag}>`,
+          };
+        });
 
-    return {
-      blocks: [
-        ...state.blocks.slice(0, startBlockIdx),
-        start,
-        ...intermediate,
-        end,
-        ...state.blocks.slice(endBlockIdx + 1),
-      ],
-    };
-  });
+      return {
+        blocks: [
+          ...state.blocks.slice(0, startBlockIdx),
+          start,
+          ...intermediate,
+          end,
+          ...state.blocks.slice(endBlockIdx + 1),
+        ],
+      };
+    },
+    () => {
+      Selection.restoreSelection(
+        editor.editorRef.current,
+        editor.state.selection
+      );
+    }
+  );
 }
