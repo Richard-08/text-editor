@@ -1,5 +1,6 @@
 import Selection from "../../utils/Selection";
 import { removeAllTags, removeAllEmptyTags } from "../../utils/helpers";
+import splitNodes from "../../utils/splitNodesWithMultiLineSelection";
 
 export default function toggleInlineNode(editor, data) {
   if (editor.singleLineSelection()) {
@@ -9,34 +10,44 @@ export default function toggleInlineNode(editor, data) {
   }
 }
 
+function getFormattedContent(formatting, splittedBlock, data) {
+  let formattingFragment = splittedBlock.current.html;
+
+  if (formatting.includes(data.tag)) {
+    formattingFragment = removeAllTags(formattingFragment, data.tag);
+  } else {
+    formattingFragment = `<${data.tag}>${formattingFragment}</${data.tag}>`;
+  }
+
+  const content =
+    ((splittedBlock.prev && splittedBlock.prev.html) || "") +
+    formattingFragment +
+    ((splittedBlock.next && splittedBlock.next.html) || "");
+
+  return removeAllEmptyTags(content);
+}
+
 function formatOnSingleLineSelection(editor, data) {
-  const { splittedStartBlock, splittedEndBlock } = editor.splitSelectedBlocks();
-  const { tags, startBlockIdx } = editor.state.selection;
+  const { splittedStartBlock } = editor.splitSelectedBlocks();
+  const { startBlockIdx, formatting } = editor.state.selection;
 
   let formattingFragment = splittedStartBlock.current.html;
-  let filtered_tags = [...tags];
-
-  if (tags.includes(data.tag)) {
-    formattingFragment = removeAllTags(formattingFragment, data.tag);
-    filtered_tags = filtered_tags.filter((tag) => tag !== data.tag);
-  } else {
-    filtered_tags.push(data.tag);
-  }
 
   formattingFragment = editor.formattedSplitContent(formattingFragment);
 
-  filtered_tags.forEach((tag) => {
+  formatting.forEach((tag) => {
     if (!editor.isBlockTag(tag)) {
       formattingFragment = `<${tag}>${formattingFragment}</${tag}>`;
     }
   });
 
-  const content =
-    splittedStartBlock.prev.html +
-    formattingFragment +
-    splittedStartBlock.next.html;
+  splittedStartBlock.current.html = formattingFragment;
 
-  const formattedContent = removeAllEmptyTags(content);
+  const formattedContent = getFormattedContent(
+    formatting,
+    splittedStartBlock,
+    data
+  );
 
   editor.commitState(
     (state) => {
@@ -45,7 +56,6 @@ function formatOnSingleLineSelection(editor, data) {
         ...data[startBlockIdx],
         content: formattedContent,
       };
-
       return {
         blocks: data,
       };
@@ -59,4 +69,50 @@ function formatOnSingleLineSelection(editor, data) {
   );
 }
 
-function formatOnMultiLineSelection(editor, data) {}
+function formatOnMultiLineSelection(editor, data) {
+  const selection = window.getSelection();
+  const { startBlock, endBlock, startBlockIdx, endBlockIdx, formatting } =
+    editor.state.selection;
+  const { start, end } = splitNodes(selection, startBlock, endBlock);
+
+  const formattedStartContent = getFormattedContent(formatting, start, data);
+  const formattedEndContent = getFormattedContent(formatting, end, data);
+
+  editor.commitState(
+    (state) => {
+      const blocks = [...state.blocks];
+      const start = {
+        ...blocks[startBlockIdx],
+        content: formattedStartContent,
+      };
+      const end = {
+        ...blocks[endBlockIdx],
+        content: formattedEndContent,
+      };
+      const intermediate = blocks
+        .slice(startBlockIdx + 1, endBlockIdx)
+        .map((block) => {
+          return {
+            ...block,
+            content: `<${data.tag}>${block.content}</${data.tag}>`,
+          };
+        });
+
+      return {
+        blocks: [
+          ...state.blocks.slice(0, startBlockIdx),
+          start,
+          ...intermediate,
+          end,
+          ...state.blocks.slice(endBlockIdx + 1),
+        ],
+      };
+    },
+    () => {
+      Selection.restoreSelection(
+        editor.editorRef.current,
+        editor.state.selection
+      );
+    }
+  );
+}

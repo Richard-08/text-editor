@@ -1,3 +1,4 @@
+import React, { Component } from "react";
 import "./Editor.css";
 
 import Toolbar from "../controls/Toolbar";
@@ -9,11 +10,9 @@ import {
   hasSameTags,
   getNodeHierarchy,
   intersection,
-  isEqual,
 } from "../utils/helpers";
 import { FORMATTING_PARAMS, INIT_STATE } from "./constants";
-
-import React, { Component } from "react";
+import splitNode from "../utils/splitNodeWithSingleLineSelection";
 
 export default class Editor extends Component {
   constructor(props) {
@@ -23,11 +22,7 @@ export default class Editor extends Component {
 
     this.history = [INIT_STATE];
     this.currentStateIdx = 0;
-    this.selection = {};
-
-    this.historyRecord = false;
     this.canMakeHistoryRecord = false;
-    this.prevActionStatus = false;
 
     this.timer = null;
     this.timeout = 500;
@@ -48,21 +43,14 @@ export default class Editor extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     clearTimeout(this.timer);
-    if (this.historyRecord && this.prevActionStatus) {
+    if (this.canMakeHistoryRecord) {
       this.history = this.history.slice(0, this.currentStateIdx + 1);
-
-      /* if (!isEqual(prevState.blocks, this.state.blocks)) {
-       this.history.push(prevState);
-      } */
-
       this.history.push(this.state);
       this.currentStateIdx = this.history.length - 1;
 
-      console.log(this.history);
-      this.historyRecord = false;
+      //console.log(this.history);
       this.canMakeHistoryRecord = false;
     }
-    this.prevActionStatus = this.canMakeHistoryRecord;
   }
 
   buildHandler(eventName) {
@@ -108,11 +96,11 @@ export default class Editor extends Component {
     const { isCollapsed, startBlock, endBlock } = this.state.selection;
     const selection = Selection.getSelection();
 
-    const splittedStartBlock = Selection.splitNode(selection, startBlock);
+    const splittedStartBlock = splitNode(selection, startBlock);
     const splittedEndBlock =
       isCollapsed || this.singleLineSelection()
         ? splittedStartBlock
-        : Selection.splitNode(selection, endBlock);
+        : splitNode(selection, endBlock);
 
     return {
       splittedStartBlock,
@@ -188,7 +176,7 @@ export default class Editor extends Component {
     };
   }
 
-  getBlocksFomatting(startBlock, endBlock) {
+  getBlocksFormatting(startBlock, endBlock) {
     const { isCollapsed, anchorNode, anchorOffset, focusNode, focusOffset } =
       Selection.getSelection();
 
@@ -199,6 +187,11 @@ export default class Editor extends Component {
         return getNodeHierarchy(focusNode, endBlock);
       } else if (!focusNode.textContent.slice(0, focusOffset).length) {
         return getNodeHierarchy(anchorNode, startBlock);
+      } else if (
+        anchorNode === this.getRootNode() ||
+        focusNode === this.getRootNode()
+      ) {
+        console.log("HERE!");
       }
       return intersection(
         getNodeHierarchy(anchorNode, startBlock),

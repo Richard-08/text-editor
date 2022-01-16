@@ -94,15 +94,25 @@ export const INIT_STATE = {
   blocks: [
     {
       type: "paragraph",
+      tag: "h1",
+      content: "Title",
+    },
+    {
+      type: "paragraph",
       tag: "p",
-      content: "<br>",
+      content: "<em>Hello</em> <em>there!</em>",
+    },
+    {
+      type: "paragraph",
+      tag: "p",
+      content: "Hi <strong><em>everyone!</em></strong>",
     },
   ],
   selection: {
     start: 0,
     end: 0,
     isCollapsed: true,
-    tags: [],
+    formatting: [],
     startBlock: null,
     endBlock: null,
     startBlockIdx: null,

@@ -10,7 +10,7 @@ export default function Toolbar({ selection, handleControl, params }) {
     return params.map((item) => {
       return {
         ...item,
-        active: selection.tags.includes(item.tag),
+        active: selection.formatting.includes(item.tag),
       };
     });
   };

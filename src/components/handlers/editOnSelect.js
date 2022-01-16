@@ -20,32 +20,17 @@ export default function editOnSelect(editor, e) {
     const currentBlock = isCollapsed ? startBlock.node : endBlock.node;
     const { start, end } = Selection.saveSelection(currentBlock);
 
-    const formatting = editor.getBlocksFomatting(
+    const formatting = editor.getBlocksFormatting(
       startBlock.node,
       endBlock.node
     );
 
-    editor.historyRecord = true;
-    editor.selection = {
-      start,
-      end,
-      isCollapsed,
-      tags: formatting,
-      startBlock:
-        startBlock.index < endBlock.index ? startBlock.node : endBlock.node,
-      startBlockIdx:
-        startBlock.index < endBlock.index ? startBlock.index : endBlock.index,
-      endBlock:
-        startBlock.index > endBlock.index ? startBlock.node : endBlock.node,
-      endBlockIdx:
-        startBlock.index > endBlock.index ? startBlock.index : endBlock.index,
-    };
     editor.setState({
-      selection: editor.selection /* {
+      selection: {
         start,
         end,
         isCollapsed,
-        tags: formatting,
+        formatting: formatting,
         startBlock:
           startBlock.index < endBlock.index ? startBlock.node : endBlock.node,
         startBlockIdx:
@@ -54,7 +39,7 @@ export default function editOnSelect(editor, e) {
           startBlock.index > endBlock.index ? startBlock.node : endBlock.node,
         endBlockIdx:
           startBlock.index > endBlock.index ? startBlock.index : endBlock.index,
-      }, */,
+      },
     });
   }
 }

@@ -17,8 +17,10 @@ function insertOnNotSelection(editor) {
 
   editor.commitState(
     (state) => {
-      const index = state.selection.startBlockIdx;
       const blocks = [...state.blocks];
+      const selection = { ...state.selection };
+      const index = selection.startBlockIdx;
+
       blocks[index] = {
         ...blocks[index],
         content: editor.getBlockContent(block.prev),
@@ -33,10 +35,15 @@ function insertOnNotSelection(editor) {
           },
           ...blocks.slice(index + 1),
         ],
+        selection: {
+          ...selection,
+          startBlockIdx: index + 1,
+        },
       };
     },
     () => {
-      Selection.restoreSelection(editor.state.selection.startBlock.nextSibling);
+      const index = editor.state.selection.startBlockIdx;
+      Selection.restoreSelection(editor.getRootNode().childNodes[index]);
     }
   );
 }
@@ -48,7 +55,8 @@ function insertOnSelection(editor) {
 
   editor.commitState(
     (state) => {
-      const { startBlockIdx, endBlockIdx } = state.selection;
+      const selection = { ...state.selection };
+      const { startBlockIdx, endBlockIdx } = selection;
 
       const startBlock = {
         ...state.blocks[startBlockIdx],
@@ -63,12 +71,16 @@ function insertOnSelection(editor) {
           endBlock,
           ...state.blocks.slice(endBlockIdx + 1),
         ],
+        selection: {
+          ...selection,
+          startBlockIdx: startBlockIdx + 1,
+        },
       };
     },
     () => {
       const block =
         editor.editorRef.current.childNodes[
-          editor.state.selection.startBlockIdx + 1
+          editor.state.selection.startBlockIdx
         ];
       Selection.restoreSelection(block);
     }

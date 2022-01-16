@@ -28,7 +28,7 @@ export default function toggleBlockNode(editor, value) {
     },
     () => {
       Selection.restoreSelection(
-        editor.editorRef.current.childNodes[endBlockIdx],
+        editor.editorRef.current,
         editor.state.selection
       );
     }
