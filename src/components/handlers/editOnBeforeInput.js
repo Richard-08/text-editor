@@ -28,7 +28,7 @@ function editOnSingleLineSelection(editor, char) {
 
   editor.setState({ blocks: data }, () => {
     const cursorPosition = editor.state.selection.start + char.length;
-    Selection.restoreSelection(editor.state.selection.startBlock, {
+    Selection.restoreSelection(editor.getRootNode(), {
       start: cursorPosition,
       end: cursorPosition,
     });

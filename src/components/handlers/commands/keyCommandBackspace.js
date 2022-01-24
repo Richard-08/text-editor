@@ -14,8 +14,12 @@ export default function keyCommandBackspace(editor) {
 /* ************************ Edit on not selection ************************* */
 
 function editOnNotSelection(editor) {
-  const { start, end } = editor.state.selection;
-  if (0 === start && 0 === end) {
+  const { startBlockIdx, start, end } = editor.state.selection;
+  const blockStartPosition = Array.from(editor.getRootNode().childNodes)
+    .slice(0, startBlockIdx)
+    .reduce((total, block) => total + block.textContent.length, 0);
+
+  if (blockStartPosition === start && blockStartPosition === end) {
     removeBlock(editor);
   } else {
     removeCharacter(editor);
@@ -53,7 +57,7 @@ function removeBlock(editor) {
       },
       () => {
         const { startBlockIdx, start, end } = editor.state.selection;
-        const node = editor.editorRef.current.childNodes[startBlockIdx];
+        const node = editor.getRootNode().childNodes[startBlockIdx];
         Selection.restoreSelection(node, { start, end });
       }
     );
@@ -62,15 +66,17 @@ function removeBlock(editor) {
 
 function removeCharacter(editor) {
   const selection = { ...editor.state.selection };
-  const { startBlockIdx } = selection;
+  const { startBlockIdx, start } = selection;
   const { prev, next } = editor.formattedSplitBlock();
 
   const char = prev.text[prev.text.length - 1];
 
-  const content = editor.getBlockContent({
+  const formattedContent = {
     html: removeLastChar(prev.html, char) + next.html,
     text: prev.text.slice(0, prev.text.length - 1) + next.text,
-  });
+  };
+
+  const content = editor.getBlockContent(formattedContent);
 
   const data = [...editor.state.blocks];
   data[startBlockIdx] = {
@@ -78,7 +84,15 @@ function removeCharacter(editor) {
     content: content,
   };
 
-  const cursorPosition = selection.start - 1;
+  const blockStartPosition = Array.from(editor.getRootNode().childNodes)
+    .slice(0, startBlockIdx)
+    .reduce((total, block) => total + block.textContent.length, 0);
+  const cursorPosition =
+    start -
+    formattedContent.text.length -
+    (blockStartPosition - formattedContent.text.length) - 1;
+
+  console.log(cursorPosition);
 
   editor.setState(
     {
