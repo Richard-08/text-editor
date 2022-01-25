@@ -13,11 +13,16 @@ export default function keyCommandBackspace(editor) {
 
 /* ************************ Edit on not selection ************************* */
 
-function editOnNotSelection(editor) {
-  const { startBlockIdx, start, end } = editor.state.selection;
-  const blockStartPosition = Array.from(editor.getRootNode().childNodes)
+function getBlockStartCursorPosition(editor) {
+  const { startBlockIdx } = editor.state.selection;
+  return Array.from(editor.getRootNode().childNodes)
     .slice(0, startBlockIdx)
     .reduce((total, block) => total + block.textContent.length, 0);
+}
+
+function editOnNotSelection(editor) {
+  const { start, end } = editor.state.selection;
+  const blockStartPosition = getBlockStartCursorPosition(editor);
 
   if (blockStartPosition === start && blockStartPosition === end) {
     removeBlock(editor);
@@ -84,15 +89,12 @@ function removeCharacter(editor) {
     content: content,
   };
 
-  const blockStartPosition = Array.from(editor.getRootNode().childNodes)
-    .slice(0, startBlockIdx)
-    .reduce((total, block) => total + block.textContent.length, 0);
+  const blockStartPosition = getBlockStartCursorPosition(editor);
   const cursorPosition =
     start -
     formattedContent.text.length -
-    (blockStartPosition - formattedContent.text.length) - 1;
-
-  console.log(cursorPosition);
+    (blockStartPosition - formattedContent.text.length) -
+    1;
 
   editor.setState(
     {
@@ -122,7 +124,7 @@ function editOnSelection(editor) {
 
 function removeBlockContent(editor) {
   const selection = { ...editor.state.selection };
-  const { startBlockIdx } = selection;
+  const { startBlockIdx, start } = selection;
   const { prev, next } = editor.formattedSplitBlock();
 
   const content = editor.getBlockContent({
@@ -137,13 +139,18 @@ function removeBlockContent(editor) {
     content: content,
   };
 
+  const blockStartPosition = getBlockStartCursorPosition(editor);
+  const cursorPosition = Math.abs(
+    start - text.length - (blockStartPosition - text.length)
+  );
+
   editor.commitState(
     {
       blocks: data,
       selection: {
         ...selection,
-        start: text.length,
-        end: text.length,
+        start: cursorPosition,
+        end: cursorPosition,
       },
     },
     () => {
