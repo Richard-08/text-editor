@@ -17,8 +17,7 @@ export default function editOnSelect(editor, e) {
       endBlock = isCollapsed ? startBlock : editor.getBlockNode(focusNode);
     }
 
-    const currentBlock = isCollapsed ? startBlock.node : endBlock.node;
-    const { start, end } = Selection.saveSelection(currentBlock);
+    const { start, end } = Selection.saveSelection(rootNode);
 
     const formatting = editor.getBlocksFormatting(
       startBlock.node,
