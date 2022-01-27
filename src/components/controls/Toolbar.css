@@ -1,5 +1,6 @@
 .toolbar {
   display: flex;
+  flex-wrap: wrap;
   padding: 15px;
   background-color: #fff;
   border-bottom: 1px solid #ccc;

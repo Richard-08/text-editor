@@ -88,6 +88,41 @@ export const FORMATTING_PARAMS = [
     tooltip: "Code",
     role: "button",
   },
+  {
+    tag: "mark",
+    type: "inline",
+    name: "Mark",
+    tooltip: "Marked text",
+    role: "button",
+  },
+  {
+    tag: "del",
+    type: "inline",
+    name: "Del",
+    tooltip: "Deleted text",
+    role: "button",
+  },
+  {
+    tag: "ins",
+    type: "inline",
+    name: "Ins",
+    tooltip: "Inserted text",
+    role: "button",
+  },
+  {
+    tag: "sup",
+    type: "inline",
+    name: "Sup",
+    tooltip: "Superscript text",
+    role: "button",
+  },
+  {
+    tag: "sub",
+    type: "inline",
+    name: "Sub",
+    tooltip: "Subscript text",
+    role: "button",
+  },
 ];
 
 export const INIT_STATE = {
@@ -120,27 +155,27 @@ export const INIT_STATE = {
   },
 };
 
-const KEY_COMMANDS = [
+export const KEY_COMMANDS = [
   {
     name: "split-block",
     keyName: "Enter",
-    keyCode: "",
+    keyCode: 13,
   },
   {
     name: "backspace",
     keyName: "Backspace",
-    keyCode: "",
+    keyCode: 8,
   },
   {
     name: "redo",
     keyName: "y",
-    keyCode: "",
+    keyCode: 89,
     modificator: "ctrlKey",
   },
   {
     name: "undo",
     keyName: "z",
-    keyCode: "",
+    keyCode: 90,
     modificator: "ctrlKey",
   },
 ];
