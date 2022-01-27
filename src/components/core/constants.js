@@ -119,3 +119,28 @@ export const INIT_STATE = {
     endBlockIdx: null,
   },
 };
+
+const KEY_COMMANDS = [
+  {
+    name: "split-block",
+    keyName: "Enter",
+    keyCode: "",
+  },
+  {
+    name: "backspace",
+    keyName: "Backspace",
+    keyCode: "",
+  },
+  {
+    name: "redo",
+    keyName: "y",
+    keyCode: "",
+    modificator: "ctrlKey",
+  },
+  {
+    name: "undo",
+    keyName: "z",
+    keyCode: "",
+    modificator: "ctrlKey",
+  },
+];
