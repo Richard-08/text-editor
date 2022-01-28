@@ -1,13 +1,13 @@
 .toolbar {
   display: flex;
   flex-wrap: wrap;
-  padding: 15px;
-  background-color: #fff;
-  border-bottom: 1px solid #ccc;
+  padding: var(--toolbar-padding);
+  background-color: var(--toolbar-bg);
+  border-bottom: 1px solid var(--toolbar-border-color);
 }
 
 .separator {
-  width: 1px;
-  background-color: #ccc;
+  width: var(--toolbar-separator-width);
+  background-color: var(--toolbar-separator-color);
   margin: 0 5px;
 }

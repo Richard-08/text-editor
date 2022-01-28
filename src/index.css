@@ -1,3 +1,29 @@
+:root {
+  /* Editor */
+  --editor-bg-color: #ffffff;
+  --editor-text-color: #000000;
+  --editor-font-size: 1.5rem;
+  --editor-padding: 10px 20px;
+  
+  /* Toolbar */
+  --toolbar-padding: 15px;
+  --toolbar-bg: #ffffff;
+  --toolbar-border-color: #ccc;
+  --toolbar-separator-color: #ccc;
+  --toolbar-separator-width: 1px;
+
+  /* Toolbar buttons */
+  --btn-bg: transparent;
+  --btn-bg-hover: rgba(0, 0, 0, 0.1);
+  --btn-bg-active: rgba(255, 127, 80, 0.15);
+  --btn-text-color: coral;
+  --btn-padding: 0.7em 1.2em;
+  --btn-font-size: 18px;
+  --btn-border-radius: 5px;
+
+
+}
+
 * {
   box-sizing: border-box;
   margin: 0;

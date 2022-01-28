@@ -1,42 +1,19 @@
 .btn {
   border: none;
-  padding: 0.7em 1.2em;
-  font-size: 18px;
+  padding: var(--btn-padding);
+  font-size: var(--btn-font-size);
   cursor: pointer;
-  background-color: transparent;
-  border-radius: 5px;
+  background-color: var(--btn-bg);
+  border-radius: var(--btn-border-radius);
   margin: 0 2px;
 }
 
 .btn:hover {
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: var(--btn-bg-hover);
 }
 
 .btn.active {
-  color: coral;
+  color: var(--btn-text-color);
   font-weight: bold;
-  background-color: rgba(255, 127, 80, 0.15);
+  background-color: var(--btn-bg-active);
 }
-
-/* [data-tooltip] {
-  position: relative;
-}
-
-[data-tooltip]::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  bottom: -100%;
-  right: 50%;
-  transform: translateX(50%);
-  visibility: hidden;
-  transition-delay: 0.2s;
-  background-color: rgba(0, 0, 0, 0.5);
-  color: #fff;
-  padding: 5px;
-  border-radius: 3px;
-  white-space: nowrap;
-}
-
-[data-tooltip]:hover::after {
-  visibility: visible;
-} */

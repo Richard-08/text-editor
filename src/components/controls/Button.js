@@ -5,10 +5,9 @@ export default function Button({ data, handleClick }) {
     <button
       className={`btn ${data.active && "active"}`}
       style={data.styles}
-      data-tooltip={data.tooltip}
+      title={data.tooltip}
       onClick={(e) => handleClick(e, data)}
-    >
-      {data.name}
-    </button>
+      dangerouslySetInnerHTML={{__html: data.name}}
+    ></button>
   );
 }
