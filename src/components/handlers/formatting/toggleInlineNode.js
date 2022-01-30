@@ -62,7 +62,7 @@ function formatOnSingleLineSelection(editor, data) {
     },
     () => {
       Selection.restoreSelection(
-        editor.editorRef.current.childNodes[startBlockIdx],
+        editor.editorRef.current,
         editor.state.selection
       );
     }
