@@ -163,21 +163,31 @@ export default class Editor extends Component {
   }
 
   getBlockNode(node) {
-    const parentNode = node.nodeType === 3 ? node.parentNode : node;
-    const blockNode =
-      parentNode.dataset && parentNode.dataset.block
-        ? parentNode
-        : parentNode.closest(this.blockSelector);
-    const blockIdx = parseInt(blockNode.dataset.block);
+    let root = this.getRootNode();
+    if (node !== root) {
+      const parentNode = node.nodeType === 3 ? node.parentNode : node;
+      const blockNode =
+        parentNode.dataset && parentNode.dataset.block
+          ? parentNode
+          : parentNode.closest(this.blockSelector);
+      const blockIdx = parseInt(blockNode.dataset.block);
+
+      return {
+        node: blockNode,
+        index: blockIdx,
+      };
+    }
+    let { anchorOffset } = window.getSelection();
 
     return {
-      node: blockNode,
-      index: blockIdx,
+      node: root.childNodes[anchorOffset],
+      index: anchorOffset,
     };
   }
 
   getBlocksFormatting(startBlock, endBlock) {
-    const { isCollapsed, anchorNode, anchorOffset, focusNode, focusOffset } =
+    let root = this.getRootNode();
+    let { isCollapsed, anchorNode, anchorOffset, focusNode, focusOffset } =
       Selection.getSelection();
 
     if (isCollapsed) {
@@ -187,11 +197,8 @@ export default class Editor extends Component {
         return getNodeHierarchy(focusNode, endBlock);
       } else if (!focusNode.textContent.slice(0, focusOffset).length) {
         return getNodeHierarchy(anchorNode, startBlock);
-      } else if (
-        anchorNode === this.getRootNode() ||
-        focusNode === this.getRootNode()
-      ) {
-        console.log("HERE!");
+      } else if (anchorNode === root || focusNode === root) {
+        return getNodeHierarchy(startBlock, startBlock);
       }
       return intersection(
         getNodeHierarchy(anchorNode, startBlock),

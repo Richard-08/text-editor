@@ -1,8 +1,29 @@
 export function getNodeHierarchy(node, parent) {
-  const tags = [];
-  while (node && node.parentNode && node !== parent) {
-    tags.push(node.parentNode.nodeName.toLowerCase());
-    node = node.parentNode;
+  let tags = [];
+  if (node === parent) {
+    tags.push(node.nodeName.toLowerCase());
+    let childTags = [];
+    let allTextNodes = true;
+    node.childNodes.forEach((el) => {
+      if (el.textContent.trim()) {
+        childTags.push(el.nodeName.toLowerCase());
+      }
+      if (el.nodeType !== 3) {
+        allTextNodes = false;
+      }
+    });
+    if (
+      !allTextNodes &&
+      childTags.length &&
+      childTags.every((tag) => tag === childTags[0])
+    ) {
+      tags = [...tags, ...childTags];
+    }
+  } else {
+    while (node && node.parentNode && node !== parent) {
+      tags.push(node.parentNode.nodeName.toLowerCase());
+      node = node.parentNode;
+    }
   }
   return tags;
 }
@@ -64,7 +85,7 @@ export function removeTag(str, type = "open") {
 }
 
 export function removeAllTags(str, tagName) {
-  const regex = new RegExp(`<(/?${tagName})>`, "g");
+  const regex = new RegExp(`(<\/?(${tagName})([^>]+)?>)`, "gi");
   const result = str.replace(regex, "");
   return result;
 }

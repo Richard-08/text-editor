@@ -38,10 +38,13 @@ function formatOnSingleLineSelection(editor, data) {
   formatting.forEach((tag) => {
     if (!editor.isBlockTag(tag)) {
       formattingFragment = `<${tag}>${formattingFragment}</${tag}>`;
+    } else {
+      formattingFragment = removeAllTags(formattingFragment, tag);
     }
   });
 
   splittedStartBlock.current.html = formattingFragment;
+  console.log(formatting, splittedStartBlock);
 
   const formattedContent = getFormattedContent(
     formatting,
