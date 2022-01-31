@@ -29,7 +29,7 @@ function getFormattedContent(formatting, splittedBlock, data) {
 
 function formatOnSingleLineSelection(editor, data) {
   const { splittedStartBlock } = editor.splitSelectedBlocks();
-  const { startBlockIdx, formatting } = editor.state.selection;
+  const { startBlockIdx, formatting, start, end } = editor.state.selection;
 
   let formattingFragment = splittedStartBlock.current.html;
 
@@ -44,12 +44,23 @@ function formatOnSingleLineSelection(editor, data) {
   });
 
   splittedStartBlock.current.html = formattingFragment;
-  console.log(formatting, splittedStartBlock);
 
   const formattedContent = getFormattedContent(
     formatting,
     splittedStartBlock,
     data
+  );
+
+  let textLength = splittedStartBlock.current.text.length;
+  let blockStartPosition = Array.from(editor.getRootNode().childNodes)
+    .slice(0, startBlockIdx)
+    .reduce((total, block) => total + block.textContent.length, 0);
+
+  let cursorStart = Math.abs(
+    start - textLength - (blockStartPosition - textLength)
+  );
+  let cursorEnd = Math.abs(
+    end - textLength - (blockStartPosition - textLength)
   );
 
   editor.commitState(
@@ -59,15 +70,19 @@ function formatOnSingleLineSelection(editor, data) {
         ...data[startBlockIdx],
         content: formattedContent,
       };
+
       return {
         blocks: data,
+        selection: {
+          ...state.selection,
+          start: cursorStart,
+          end: cursorEnd,
+        },
       };
     },
     () => {
-      Selection.restoreSelection(
-        editor.editorRef.current,
-        editor.state.selection
-      );
+      let { start, end, startBlock } = editor.state.selection;
+      Selection.restoreSelection(startBlock, { start, end });
     }
   );
 }
