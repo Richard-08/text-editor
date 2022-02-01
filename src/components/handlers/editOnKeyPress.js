@@ -1,10 +1,7 @@
 export default function editOnKeyPress(editor, e) {
-  if (
-    e.key !== "Enter" &&
-    e.key !== "Control" &&
-    e.key !== "z" &&
-    e.key !== "y"
-  ) {
+  let command = editor.defineCommand(e);
+
+  if (!command && e.key !== "Control") {
     clearTimeout(editor.timer);
 
     editor.timer = setTimeout(() => {

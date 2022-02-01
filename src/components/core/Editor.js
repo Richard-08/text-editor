@@ -11,7 +11,7 @@ import {
   getNodeHierarchy,
   intersection,
 } from "../utils/helpers";
-import { FORMATTING_PARAMS, INIT_STATE } from "./constants";
+import { FORMATTING_PARAMS, INIT_STATE, KEY_COMMANDS } from "./constants";
 import splitNode from "../utils/splitNodeWithSingleLineSelection";
 
 export default class Editor extends Component {
@@ -216,6 +216,15 @@ export default class Editor extends Component {
 
   getRootNode() {
     return this.editorRef.current;
+  }
+
+  defineCommand(event) {
+    return KEY_COMMANDS.find((command) => {
+      if (command.modificator) {
+        return event.key === command.keyName && event[command.modificator];
+      }
+      return event.key === command.keyName;
+    });
   }
 
   render() {

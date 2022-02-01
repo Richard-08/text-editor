@@ -3,19 +3,8 @@ import keyCommandBackspace from "./commands/keyCommandBackspace";
 import keyCommandRedo from "./commands/keyCommandRedo";
 import keyCommandUndo from "./commands/keyCommandUndo";
 
-import { KEY_COMMANDS } from "../core/constants";
-
-function defineCommand(e, commands) {
-  return commands.find((command) => {
-    if (command.modificator) {
-      return e.key === command.keyName && e[command.modificator];
-    }
-    return e.key === command.keyName;
-  });
-}
-
 export default function editOnKeyDown(editor, e) {
-  let command = defineCommand(e, KEY_COMMANDS);
+  let command = editor.defineCommand(e);
 
   if (command && command.name) {
     switch (command.name) {
