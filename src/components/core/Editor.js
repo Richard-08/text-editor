@@ -48,7 +48,7 @@ export default class Editor extends Component {
       this.history.push(this.state);
       this.currentStateIdx = this.history.length - 1;
 
-      //console.log(this.history);
+      console.log(this.history);
       this.canMakeHistoryRecord = false;
     }
   }
