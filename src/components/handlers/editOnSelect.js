@@ -11,7 +11,9 @@ export default function editOnSelect(editor, e) {
 
     if (anchorNode === rootNode && focusNode === rootNode) {
       startBlock = editor.getBlockNode(rootNode.childNodes[anchorOffset]);
-      endBlock = editor.getBlockNode(rootNode.childNodes[focusOffset - 1]);
+      endBlock = editor.getBlockNode(
+        rootNode.childNodes[focusOffset > 0 ? focusOffset - 1 : focusOffset]
+      );
     } else {
       startBlock = editor.getBlockNode(anchorNode);
       endBlock = isCollapsed ? startBlock : editor.getBlockNode(focusNode);

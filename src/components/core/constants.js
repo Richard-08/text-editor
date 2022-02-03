@@ -136,10 +136,10 @@ export const INIT_STATE = {
   blocks: [
     {
       type: "paragraph",
-      tag: "h1",
-      content: "Title",
+      tag: "p",
+      content: "<br/>",
     },
-    {
+    /* {
       type: "paragraph",
       tag: "p",
       content: "<em>Hello</em> <em>there!</em>",
@@ -148,7 +148,7 @@ export const INIT_STATE = {
       type: "paragraph",
       tag: "p",
       content: "Hi <strong><em>everyone!</em></strong>",
-    },
+    }, */
   ],
   selection: {
     start: 0,
