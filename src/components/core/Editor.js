@@ -41,11 +41,14 @@ export default class Editor extends Component {
     this.handleControl = this.buildHandler("onFormatting");
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate() {
     clearTimeout(this.timer);
     if (this.canMakeHistoryRecord) {
       this.history = this.history.slice(0, this.currentStateIdx + 1);
-      this.history.push(this.state);
+      this.history.push({
+        blocks: [...this.state.blocks],
+        selection: { ...this.state.selection },
+      });
       this.currentStateIdx = this.history.length - 1;
 
       console.log(this.history);

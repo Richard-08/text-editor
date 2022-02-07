@@ -3,6 +3,7 @@ import Selection from "../../utils/Selection";
 export default function keyCommandUndo(editor) {
   if (editor.history[editor.currentStateIdx - 1]) {
     editor.currentStateIdx -= 1;
+    editor.history = editor.history.slice(0, editor.currentStateIdx + 1);
     const prevState = editor.history[editor.currentStateIdx];
 
     editor.setState(
