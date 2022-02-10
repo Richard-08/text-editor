@@ -10,6 +10,7 @@ export default function toggleBlockNode(editor, value) {
         .map((block) => {
           return {
             ...block,
+            type: value.type,
             tag: editor.singleLineSelection()
               ? block.tag === value.tag
                 ? "p"

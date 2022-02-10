@@ -135,17 +135,17 @@ export const FORMATTING_PARAMS = [
 export const INIT_STATE = {
   blocks: [
     {
-      type: "paragraph",
+      type: "block",
       tag: "p",
       content: "<br/>",
     },
     /* {
-      type: "paragraph",
+      type: "block",
       tag: "p",
       content: "<em>Hello</em> <em>there!</em>",
     },
     {
-      type: "paragraph",
+      type: "block",
       tag: "p",
       content: "Hi <strong><em>everyone!</em></strong>",
     }, */

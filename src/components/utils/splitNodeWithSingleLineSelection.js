@@ -2,12 +2,15 @@ export default function (selection, node) {
   const range = selection.getRangeAt(0);
   const { firstChild, lastChild } = node;
 
+  let startContainer = range.startContainer.contains(node) ? node : range.startContainer; 
+  let endContainer = range.endContainer.contains(node) ? node : range.endContainer; 
+
   const previousRange = document.createRange();
   previousRange.setStartBefore(firstChild);
-  previousRange.setEnd(range.startContainer, range.startOffset);
+  previousRange.setEnd(startContainer, range.startOffset);
 
   const nextRange = document.createRange();
-  nextRange.setStart(range.endContainer, range.endOffset);
+  nextRange.setStart(endContainer, range.endOffset);
   nextRange.setEndAfter(lastChild);
 
   const prev = document.createElement("div");

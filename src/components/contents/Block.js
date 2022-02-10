@@ -7,7 +7,7 @@ export default class Block extends Component {
     const data = this.props.data;
     const TagName = data.tag;
 
-    if (data.type === "title" || data.type === "paragraph") {
+    if (data.type === "block") {
       return (
         <TagName
           className="block"
